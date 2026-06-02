@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profil Siswa — XI TKJ 1 SMK Imelda</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="shortcut icon" href="https://uimedan.ac.id/uploads/setup/Wgv2svxKBHl25JLRy0uHThgY1iae5E0srQ8U2b9x.png">
+  
+  <style>
+    /* ===================== VARIABEL & RESET ===================== */
+    :root {
+      --neon-blue: #00f0ff;
+      --neon-cyan: #00ffcc;
+      --neon-purple: #bf00ff;
+      --neon-pink: #ff00aa;
+      --dark-bg: #020818;
+      --border-neon: rgba(0,240,255,0.25);
+      --glow-blue: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.2);
+      --font-display: 'Orbitron', monospace;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-body: 'Rajdhani', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background: var(--dark-bg);
+      color: #e0f7ff;
+      font-family: var(--font-body);
+      cursor: none;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ===================== CURSOR ===================== */
+    #cursor-dot {
+      width:8px; height:8px; background:var(--neon-cyan);
+      border-radius:50%; position:fixed; top:0; left:0;
+      pointer-events:none; z-index:99999;
+      box-shadow:0 0 10px var(--neon-cyan);
+    }
+    #cursor-ring {
+      width:36px; height:36px; border:1.5px solid rgba(0,240,255,0.6);
+      border-radius:50%; position:fixed; top:0; left:0;
+      pointer-events:none; z-index:99998;
+      transition:transform 0.12s ease;
+    }
+
+    /* ===================== BACKGROUND ===================== */
+    .grid-bg {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+      background-size:50px 50px;
+    }
+    .orb {
+      position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:0;
+    }
+    .orb1 { width:500px; height:500px; background:radial-gradient(circle,rgba(0,240,255,0.06) 0%,transparent 70%); top:-100px; left:-100px; }
+    .orb2 { width:400px; height:400px; background:radial-gradient(circle,rgba(191,0,255,0.06) 0%,transparent 70%); bottom:0; right:0; }
+
+    /* ===================== NAVBAR ===================== */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      background:rgba(2,8,24,0.92); backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border-neon);
+      padding:0.8rem 1.5rem;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-brand {
+      font-family:var(--font-display); font-size:0.8rem; font-weight:700;
+      color:var(--neon-cyan); text-decoration:none; letter-spacing:0.15em;
+      text-shadow:var(--glow-blue);
+    }
+    .btn-back {
+      font-family:var(--font-mono); font-size:0.72rem;
+      color:rgba(224,247,255,0.65); text-decoration:none;
+      padding:0.35rem 0.9rem; border-radius:6px;
+      border:1px solid var(--border-neon);
+      transition:all 0.25s;
+      display:flex; align-items:center; gap:0.5rem;
+    }
+    .btn-back:hover { color:var(--neon-cyan); background:rgba(0,240,255,0.06); }
+
+    /* ===================== MAIN WRAPPER ===================== */
+    .main {
+      position:relative; z-index:1;
+      max-width:1280px; margin:0 auto;
+      padding:6rem 1.5rem 3rem;
+    }
+
+    /* ===================== PAGE HEADER ===================== */
+    .page-header { margin-bottom:2.5rem; }
+    .page-tag {
+      font-family:var(--font-mono); font-size:0.7rem;
+      color:var(--neon-cyan); letter-spacing:0.25em; margin-bottom:0.5rem;
+    }
+    .page-tag::before { content:'// '; opacity:0.5; }
+    .page-title {
+      font-family:var(--font-display); font-size:clamp(1.5rem,4vw,2.5rem);
+      font-weight:700; line-height:1.1;
+    }
+    .page-title span {
+      background:linear-gradient(135deg,var(--neon-cyan),var(--neon-blue));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .page-divider {
+      width:60px; height:2px;
+      background:linear-gradient(90deg,var(--neon-cyan),transparent);
+      margin-top:1rem; box-shadow:var(--glow-blue);
+    }
+
+    /* ===================== SEARCH & FILTER ===================== */
+    .toolbar {
+      display:flex; gap:1rem; flex-wrap:wrap;
+      align-items:center; margin-bottom:2rem;
+    }
+    .search-wrap { position:relative; flex:1; min-width:220px; max-width:380px; }
+    .search-inp {
+      width:100%; padding:0.75rem 1rem 0.75rem 2.8rem;
+      background:rgba(0,240,255,0.04); border:1px solid var(--border-neon);
+      border-radius:10px; color:#e0f7ff;
+      font-family:var(--font-mono); font-size:0.78rem; outline:none;
+      transition:all 0.3s;
+    }
+    .search-inp:focus { border-color:var(--neon-cyan); box-shadow:0 0 20px rgba(0,240,255,0.12); }
+    .search-inp::placeholder { color:rgba(224,247,255,0.25); }
+    .search-icon { position:absolute; left:0.9rem; top:50%; transform:translateY(-50%); color:rgba(0,240,255,0.5); }
+    .filter-btn {
+      font-family:var(--font-mono); font-size:0.7rem;
+      padding:0.6rem 1.1rem; border-radius:8px;
+      border:1px solid var(--border-neon);
+      background:transparent; color:rgba(224,247,255,0.6);
+      cursor:none; transition:all 0.25s; letter-spacing:0.08em;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background:rgba(0,240,255,0.1); color:var(--neon-cyan);
+      border-color:rgba(0,240,255,0.5);
+    }
+    .total-badge {
+      font-family:var(--font-mono); font-size:0.68rem;
+      color:rgba(224,247,255,0.4); margin-left:auto;
+      letter-spacing:0.08em;
+    }
+    .total-badge span { color:var(--neon-cyan); }
+
+    /* ===================== SISWA GRID ===================== */
+    .siswa-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+      gap:1.2rem;
+    }
+
+    /* ===================== KARTU SISWA ===================== */
+    .siswa-card {
+      background:rgba(0,240,255,0.03);
+      border:1px solid var(--border-neon);
+      border-radius:16px; padding:1.5rem 1rem;
+      text-align:center; cursor:none;
+      transition:all 0.35s ease;
+      position:relative; overflow:hidden;
+      animation:card-in 0.4s ease both;
+    }
+    @keyframes card-in { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+    .siswa-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,var(--neon-cyan),transparent);
+      opacity:0; transition:opacity 0.3s;
+    }
+    .siswa-card:hover::before { opacity:1; }
+    .siswa-card:hover {
+      border-color:rgba(0,240,255,0.5);
+      transform:translateY(-6px);
+      box-shadow:0 12px 40px rgba(0,240,255,0.12);
+    }
+
+    /* Foto avatar siswa */
+    .siswa-avatar {
+      width:88px; height:88px; border-radius:50%;
+      margin:0 auto 1rem;
+      border:2px solid var(--border-neon);
+      overflow:hidden; position:relative;
+      background:linear-gradient(135deg,rgba(0,240,255,0.1),rgba(191,0,255,0.1));
+      display:flex; align-items:center; justify-content:center;
+      transition:all 0.3s;
+    }
+    .siswa-card:hover .siswa-avatar { border-color:var(--neon-cyan); box-shadow:var(--glow-blue); }
+    .siswa-avatar img {
+      width:100%; height:100%; object-fit:cover;
+      position:absolute; inset:0;
+    }
+    .siswa-avatar .avatar-placeholder {
+      font-size:2.2rem; color:rgba(0,240,255,0.4);
+    }
+
+    .siswa-no {
+      position:absolute; top:0.75rem; left:0.75rem;
+      font-family:var(--font-mono); font-size:0.6rem;
+      color:rgba(0,240,255,0.4); letter-spacing:0.08em;
+    }
+    .siswa-name {
+      font-weight:700; font-size:0.92rem; color:#fff;
+      margin-bottom:0.3rem; line-height:1.3;
+    }
+    .siswa-nis {
+      font-family:var(--font-mono); font-size:0.65rem;
+      color:rgba(224,247,255,0.4); letter-spacing:0.08em;
+      margin-bottom:0.6rem;
+    }
+    .siswa-badge {
+      display:inline-block; padding:0.18rem 0.6rem;
+      border-radius:100px; font-size:0.6rem;
+      font-family:var(--font-mono); letter-spacing:0.08em; font-weight:700;
+    }
+    .badge-l { background:rgba(0,240,255,0.08); color:var(--neon-cyan); border:1px solid rgba(0,240,255,0.2); }
+    .badge-p { background:rgba(255,0,170,0.08); color:var(--neon-pink); border:1px solid rgba(255,0,170,0.2); }
+    .badge-ketua { background:rgba(191,0,255,0.1); color:var(--neon-purple); border:1px solid rgba(191,0,255,0.3); }
+
+    .siswa-card .view-btn {
+      display:none; margin-top:0.85rem;
+      font-family:var(--font-mono); font-size:0.65rem;
+      color:var(--neon-cyan); letter-spacing:0.1em;
+      background:rgba(0,240,255,0.07); border:1px solid var(--border-neon);
+      border-radius:6px; padding:0.35rem 0.8rem;
+      transition:all 0.2s; cursor:none;
+    }
+    .siswa-card:hover .view-btn { display:inline-block; }
+    .siswa-card .view-btn:hover { background:rgba(0,240,255,0.15); }
+
+    /* ===================== MODAL PROFIL ===================== */
+    #modal-overlay {
+      position:fixed; inset:0; z-index:500;
+      background:rgba(0,0,0,0.75); backdrop-filter:blur(8px);
+      display:none; align-items:center; justify-content:center;
+      padding:1rem;
+    }
+    #modal-overlay.open { display:flex; }
+    .modal-box {
+      background:#020c1b;
+      border:1px solid var(--border-neon);
+      border-radius:20px; width:100%; max-width:560px;
+      max-height:90vh; overflow-y:auto;
+      position:relative;
+      animation:modal-in 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes modal-in { from{opacity:0;transform:scale(0.88)} to{opacity:1;transform:scale(1)} }
+    .modal-box::-webkit-scrollbar { width:4px; }
+    .modal-box::-webkit-scrollbar-thumb { background:rgba(0,240,255,0.2); border-radius:2px; }
+
+    /* Header modal */
+    .modal-header {
+      position:relative; padding:2rem 2rem 1.5rem;
+      text-align:center;
+      background:linear-gradient(180deg,rgba(0,240,255,0.06),transparent);
+      border-bottom:1px solid var(--border-neon);
+    }
+    .modal-close {
+      position:absolute; top:1rem; right:1rem;
+      background:rgba(0,240,255,0.07); border:1px solid var(--border-neon);
+      border-radius:8px; width:34px; height:34px;
+      display:flex; align-items:center; justify-content:center;
+      color:rgba(224,247,255,0.6); font-size:1.1rem;
+      cursor:none; transition:all 0.2s;
+    }
+    .modal-close:hover { background:rgba(255,0,100,0.1); color:#ff6b6b; border-color:rgba(255,0,100,0.3); }
+
+    /* Foto profil di modal */
+    .modal-avatar {
+      width:110px; height:110px; border-radius:50%;
+      margin:0 auto 1rem;
+      border:2px solid var(--neon-cyan);
+      overflow:hidden; position:relative;
+      background:linear-gradient(135deg,rgba(0,240,255,0.1),rgba(191,0,255,0.1));
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:var(--glow-blue);
+    }
+    .modal-avatar img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+    .modal-avatar .av-placeholder { font-size:3rem; color:rgba(0,240,255,0.4); }
+
+    /* Tombol upload foto */
+    .upload-btn-wrap { margin-top:0.75rem; }
+    .upload-btn {
+      font-family:var(--font-mono); font-size:0.65rem;
+      color:var(--neon-cyan); letter-spacing:0.1em;
+      background:rgba(0,240,255,0.07); border:1px solid var(--border-neon);
+      border-radius:8px; padding:0.4rem 1rem;
+      cursor:none; transition:all 0.2s;
+      display:inline-flex; align-items:center; gap:0.4rem;
+    }
+    .upload-btn:hover { background:rgba(0,240,255,0.15); border-color:var(--neon-cyan); }
+    #foto-input { display:none; }
+    .upload-progress {
+      font-family:var(--font-mono); font-size:0.65rem;
+      color:rgba(224,247,255,0.4); margin-top:0.4rem;
+      min-height:1rem;
+    }
+
+    .modal-name {
+      font-family:var(--font-display); font-size:1.2rem;
+      font-weight:700; color:#fff; margin-bottom:0.3rem;
+    }
+    .modal-role {
+      font-family:var(--font-mono); font-size:0.7rem;
+      color:var(--neon-cyan); letter-spacing:0.1em;
+    }
+
+    /* Body modal — biodata */
+    .modal-body { padding:1.5rem 2rem 2rem; }
+    .bio-section-title {
+      font-family:var(--font-mono); font-size:0.65rem;
+      color:rgba(0,240,255,0.5); letter-spacing:0.2em;
+      margin-bottom:1rem; margin-top:1.5rem;
+    }
+    .bio-section-title:first-child { margin-top:0; }
+    .bio-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+    .bio-item {
+      padding:0.85rem 1rem;
+      background:rgba(0,240,255,0.03);
+      border:1px solid rgba(0,240,255,0.07);
+      border-radius:10px; transition:all 0.2s;
+    }
+    .bio-item:hover { background:rgba(0,240,255,0.06); border-color:var(--border-neon); }
+    .bio-label {
+      font-family:var(--font-mono); font-size:0.6rem;
+      color:rgba(0,240,255,0.5); letter-spacing:0.1em; margin-bottom:0.3rem;
+    }
+    .bio-value { font-size:0.88rem; color:#e0f7ff; font-weight:600; }
+    .bio-item.full { grid-column:1/-1; }
+
+    /* Edit biodata */
+    .bio-input {
+      width:100%; background:transparent; border:none; outline:none;
+      color:#e0f7ff; font-family:var(--font-body); font-size:0.88rem;
+      font-weight:600;
+    }
+    .bio-input::placeholder { color:rgba(224,247,255,0.25); font-weight:400; }
+
+    /* Tombol simpan */
+    .btn-save {
+      width:100%; margin-top:1.5rem;
+      padding:0.9rem; border-radius:10px;
+      background:linear-gradient(135deg,var(--neon-blue),var(--neon-cyan));
+      border:none; color:#000; font-family:var(--font-mono);
+      font-size:0.78rem; font-weight:700; letter-spacing:0.15em;
+      cursor:none; transition:all 0.3s;
+    }
+    .btn-save:hover { box-shadow:var(--glow-blue); transform:translateY(-2px); }
+    .btn-save:disabled { opacity:0.5; cursor:not-allowed; }
+
+    /* Toast notifikasi */
+    #toast {
+      position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(20px);
+      background:rgba(0,240,255,0.1); border:1px solid var(--neon-cyan);
+      border-radius:12px; padding:0.75rem 1.5rem;
+      font-family:var(--font-mono); font-size:0.75rem; color:var(--neon-cyan);
+      z-index:9999; opacity:0; transition:all 0.3s;
+      white-space:nowrap; backdrop-filter:blur(10px);
+    }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* Loading spinner */
+    .spinner {
+      width:20px; height:20px; border-radius:50%;
+      border:2px solid rgba(0,240,255,0.2);
+      border-top-color:var(--neon-cyan);
+      animation:spin 0.8s linear infinite; display:inline-block;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* Empty state */
+    .empty-state {
+      text-align:center; padding:3rem;
+      font-family:var(--font-mono); font-size:0.8rem;
+      color:rgba(224,247,255,0.3); letter-spacing:0.1em;
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media(max-width:640px){
+      .siswa-grid { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+      .bio-grid { grid-template-columns:1fr; }
+      .modal-body { padding:1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <!-- Custom cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Toast notifikasi -->
+  <div id="toast"></div>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav>
+    <a href="#" class="nav-brand">XI_TKJ1.EXE</a>
+    <a href="index.html" class="btn-back">
+      <i class="bi bi-arrow-left"></i> KEMBALI
+    </a>
+  </nav>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <div class="main">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <p class="page-tag">DATAB SISWA</p>
+      <h1 class="page-title">Data <span>Siswa</span> XI TKJ 1</h1>
+      <div class="page-divider"></div>
+    </div>
+
+    <!-- Toolbar: Search + Filter -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="search-inp" id="search-inp" placeholder="Cari nama siswa..." oninput="filterSiswa()" />
+      </div>
+      <button class="filter-btn active" onclick="setFilter(this,'semua')">SEMUA</button>
+      <button class="filter-btn" onclick="setFilter(this,'putra')">PUTRA ♂</button>
+      <button class="filter-btn" onclick="setFilter(this,'putri')">PUTRI ♀</button>
+      <div class="total-badge">Total: <span id="total-count">0</span> siswa</div>
+    </div>
+
+    <!-- Grid kartu siswa -->
+    <div class="siswa-grid" id="siswa-grid">
+      <div class="empty-state"><div class="spinner"></div><br><br>Memuat data siswa...</div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL PROFIL SISWA ===================== -->
+  <div id="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal-box" id="modal-box">
+
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal()"><i class="bi bi-x-lg"></i></button>
+
+        <!-- Foto profil -->
+        <div class="modal-avatar" id="modal-avatar">
+          <span class="av-placeholder" id="modal-av-placeholder"><i class="bi bi-person-fill"></i></span>
+          <img id="modal-foto" src="" alt="" style="display:none" />
+        </div>
+
+        <!-- Tombol upload foto -->
+        <div class="upload-btn-wrap">
+          <button class="upload-btn" onclick="document.getElementById('foto-input').click()">
+            <i class="bi bi-camera-fill"></i> UPLOAD FOTO
+          </button>
+          <input type="file" id="foto-input" accept="image/*" onchange="handleFotoUpload(event)" />
+          <div class="upload-progress" id="upload-progress"></div>
+        </div>
+
+        <div class="modal-name" id="modal-name">—</div>
+        <div class="modal-role" id="modal-role">// ANGGOTA KELAS</div>
+      </div>
+
+      <div class="modal-body">
+        <div class="bio-section-title">// IDENTITAS SISWA</div>
+        <div class="bio-grid">
+          <div class="bio-item">
+            <div class="bio-label">NIS</div>
+            <div class="bio-value" id="b-nis">—</div>
+          </div>
+          <div class="bio-item">
+            <div class="bio-label">JENIS KELAMIN</div>
+            <div class="bio-value" id="b-jk">—</div>
+          </div>
+          <div class="bio-item full">
+            <div class="bio-label">TEMPAT, TANGGAL LAHIR</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-ttl" placeholder="Contoh: Medan, 01 Januari 2007" />
+            </div>
+          </div>
+          <div class="bio-item full">
+            <div class="bio-label">ALAMAT</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-alamat" placeholder="Masukkan alamat lengkap..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="bio-section-title">// KONTAK</div>
+        <div class="bio-grid">
+          <div class="bio-item">
+            <div class="bio-label">NO. HP / WA</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-hp" placeholder="08xxxxxxxxxx" />
+            </div>
+          </div>
+          <div class="bio-item">
+            <div class="bio-label">INSTAGRAM</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-ig" placeholder="@username" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bio-section-title">// AKADEMIK</div>
+        <div class="bio-grid">
+          <div class="bio-item">
+            <div class="bio-label">NILAI RATA-RATA</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-nilai" placeholder="Contoh: 88.5" type="number" />
+            </div>
+          </div>
+          <div class="bio-item">
+            <div class="bio-label">KEAHLIAN / HOBI</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-hobi" placeholder="Contoh: Networking, Gaming" />
+            </div>
+          </div>
+          <div class="bio-item full">
+            <div class="bio-label">CITA-CITA</div>
+            <div class="bio-value">
+              <input class="bio-input" id="b-cita" placeholder="Contoh: Network Engineer, IT Security" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol simpan ke Firebase -->
+        <button class="btn-save" id="btn-save" onclick="simpanProfil()">
+          <i class="bi bi-cloud-upload-fill" style="margin-right:0.5rem"></i>
+          SIMPAN PROFIL
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FIREBASE SDK ===================== -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <script>
+    /* ============================================================
+       FIREBASE CONFIG — TKJ1-Chat
+    ============================================================ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyAub3il781ngC88d177BWbiLcIAn_85fpc",
+      authDomain: "tkj1-chat.firebaseapp.com",
+      databaseURL: "https://tkj1-chat-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "tkj1-chat",
+      storageBucket: "tkj1-chat.firebasestorage.app",
+      messagingSenderId: "233481239276",
+      appId: "1:233481239276:web:5b4852503b45dd27edc3c9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db      = firebase.database();
+    const storage = firebase.storage();
+
+    /* ============================================================
+       DATA SISWA (36 orang)
+    ============================================================ */
+    const siswaData = [
+      {no:1, nama:"Rizky Pratama",       nis:"2401001", jk:"L", jabatan:"Ketua"},
+      {no:2, nama:"Dewi Rahmawati",       nis:"2401002", jk:"P", jabatan:"Wakil Ketua"},
+      {no:3, nama:"Siti Nurhaliza",       nis:"2401003", jk:"P", jabatan:"Sekretaris"},
+      {no:4, nama:"Faisal Hidayat",       nis:"2401004", jk:"L", jabatan:"Bendahara"},
+      {no:5, nama:"Rina Marlina",         nis:"2401005", jk:"P", jabatan:"Anggota"},
+      {no:6, nama:"Aldi Firmansyah",      nis:"2401006", jk:"L", jabatan:"Anggota"},
+      {no:7, nama:"Budi Santoso",         nis:"2401007", jk:"L", jabatan:"Anggota"},
+      {no:8, nama:"Wahyu Setiawan",       nis:"2401008", jk:"L", jabatan:"Anggota"},
+      {no:9, nama:"Novi Andriani",        nis:"2401009", jk:"P", jabatan:"Anggota"},
+      {no:10,nama:"Eko Saputra",          nis:"2401010", jk:"L", jabatan:"Anggota"},
+      {no:11,nama:"Hendra Gunawan",       nis:"2401011", jk:"L", jabatan:"Anggota"},
+      {no:12,nama:"Putri Wulandari",      nis:"2401012", jk:"P", jabatan:"Anggota"},
+      {no:13,nama:"Ahmad Dzikri",         nis:"2401013", jk:"L", jabatan:"Anggota"},
+      {no:14,nama:"Nurul Fadhilah",       nis:"2401014", jk:"P", jabatan:"Anggota"},
+      {no:15,nama:"Reza Maulana",         nis:"2401015", jk:"L", jabatan:"Anggota"},
+      {no:16,nama:"Lestari Indah",        nis:"2401016", jk:"P", jabatan:"Anggota"},
+      {no:17,nama:"Yusuf Ramadhan",       nis:"2401017", jk:"L", jabatan:"Anggota"},
+      {no:18,nama:"Alya Syafira",         nis:"2401018", jk:"P", jabatan:"Anggota"},
+      {no:19,nama:"Fandi Pratama",        nis:"2401019", jk:"L", jabatan:"Anggota"},
+      {no:20,nama:"Melisa Anggraini",     nis:"2401020", jk:"P", jabatan:"Anggota"},
+      {no:21,nama:"Dimas Aditya",         nis:"2401021", jk:"L", jabatan:"Anggota"},
+      {no:22,nama:"Rahma Yulia",          nis:"2401022", jk:"P", jabatan:"Anggota"},
+      {no:23,nama:"Surya Darmawan",       nis:"2401023", jk:"L", jabatan:"Anggota"},
+      {no:24,nama:"Fitri Handayani",      nis:"2401024", jk:"P", jabatan:"Anggota"},
+      {no:25,nama:"Bagas Nugroho",        nis:"2401025", jk:"L", jabatan:"Anggota"},
+      {no:26,nama:"Zahra Azizah",         nis:"2401026", jk:"P", jabatan:"Anggota"},
+      {no:27,nama:"Teguh Wibowo",         nis:"2401027", jk:"L", jabatan:"Anggota"},
+      {no:28,nama:"Citra Permata",        nis:"2401028", jk:"P", jabatan:"Anggota"},
+      {no:29,nama:"Ilham Ramadhan",       nis:"2401029", jk:"L", jabatan:"Anggota"},
+      {no:30,nama:"Anis Setyaningrum",    nis:"2401030", jk:"P", jabatan:"Anggota"},
+      {no:31,nama:"Kevin Fahreza",        nis:"2401031", jk:"L", jabatan:"Anggota"},
+      {no:32,nama:"Dinda Khalisa",        nis:"2401032", jk:"P", jabatan:"Anggota"},
+      {no:33,nama:"Ridho Pangestu",       nis:"2401033", jk:"L", jabatan:"Anggota"},
+      {no:34,nama:"Nadia Safira",         nis:"2401034", jk:"P", jabatan:"Anggota"},
+      {no:35,nama:"Galih Prakoso",        nis:"2401035", jk:"L", jabatan:"Anggota"},
+      {no:36,nama:"Putri Amelia",         nis:"2401036", jk:"P", jabatan:"Anggota"},
+    ];
+
+    /* ============================================================
+       STATE
+    ============================================================ */
+    let profilData  = {};   // data profil dari Firebase
+    let activeSiswa = null; // siswa yang sedang dibuka modal
+    let activeFilter= 'semua';
+    let pendingFotoBase64 = null; // foto yang belum disimpan
+
+    /* ============================================================
+       CURSOR
+    ============================================================ */
+    const dot=document.getElementById('cursor-dot'), ring=document.getElementById('cursor-ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+    (function tick(){
+      dot.style.transform=`translate(${mx-4}px,${my-4}px)`;
+      rx+=(mx-rx-18)*0.12; ry+=(my-ry-18)*0.12;
+      ring.style.transform=`translate(${rx}px,${ry}px)`;
+      requestAnimationFrame(tick);
+    })();
+
+    /* ============================================================
+       LOAD PROFIL DARI FIREBASE lalu render grid
+    ============================================================ */
+    db.ref('profil_siswa').on('value', snapshot => {
+      profilData = snapshot.val() || {};
+      renderGrid();
+    });
+
+    /* ============================================================
+       RENDER GRID KARTU SISWA
+    ============================================================ */
+    function renderGrid(){
+      const q      = document.getElementById('search-inp').value.toLowerCase();
+      const grid   = document.getElementById('siswa-grid');
+
+      // Filter berdasarkan search + jenis kelamin
+      const filtered = siswaData.filter(s => {
+        const matchQ  = s.nama.toLowerCase().includes(q) || s.nis.includes(q);
+        const matchJK = activeFilter==='semua' ||
+                        (activeFilter==='putra' && s.jk==='L') ||
+                        (activeFilter==='putri' && s.jk==='P');
+        return matchQ && matchJK;
+      });
+
+      document.getElementById('total-count').textContent = filtered.length;
+
+      if(!filtered.length){
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Tidak ada siswa ditemukan 🔍</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map((s, i) => {
+        const p    = profilData[s.nis] || {};
+        const foto = p.foto || '';
+        const delay= (i % 12) * 40;
+        return `
+          <div class="siswa-card" onclick="openModal('${s.nis}')" style="animation-delay:${delay}ms">
+            <div class="siswa-no">#${String(s.no).padStart(2,'0')}</div>
+            <div class="siswa-avatar">
+              ${foto
+                ? `<img src="${foto}" alt="${s.nama}" />`
+                : `<span class="avatar-placeholder"><i class="bi bi-person-fill"></i></span>`}
+            </div>
+            <div class="siswa-name">${s.nama}</div>
+            <div class="siswa-nis">${s.nis}</div>
+            <span class="siswa-badge ${s.jabatan==='Ketua'||s.jabatan==='Wakil Ketua'||s.jabatan==='Sekretaris'||s.jabatan==='Bendahara' ? 'badge-ketua' : (s.jk==='L'?'badge-l':'badge-p')}">
+              ${s.jabatan}
+            </span>
+            <br>
+            <span class="view-btn"><i class="bi bi-eye-fill"></i> LIHAT PROFIL</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ============================================================
+       FILTER & SEARCH
+    ============================================================ */
+    function filterSiswa(){ renderGrid(); }
+    function setFilter(btn, f){
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = f;
+      renderGrid();
+    }
+
+    /* ============================================================
+       BUKA MODAL PROFIL
+    ============================================================ */
+    function openModal(nis){
+      const s = siswaData.find(x=>x.nis===nis);
+      if(!s) return;
+      activeSiswa = s;
+      pendingFotoBase64 = null;
+
+      // Isi header modal
+      document.getElementById('modal-name').textContent = s.nama;
+      document.getElementById('modal-role').textContent =
+        `// ${s.jabatan.toUpperCase()} — XI TKJ 1`;
+      document.getElementById('b-nis').textContent = s.nis;
+      document.getElementById('b-jk').textContent  = s.jk==='L' ? '♂ Laki-laki' : '♀ Perempuan';
+
+      // Ambil data profil dari Firebase (jika ada)
+      const p = profilData[nis] || {};
+
+      // Foto
+      const fotoEl = document.getElementById('modal-foto');
+      const placEl = document.getElementById('modal-av-placeholder');
+      if(p.foto){ fotoEl.src=p.foto; fotoEl.style.display='block'; placEl.style.display='none'; }
+      else       { fotoEl.style.display='none'; placEl.style.display='flex'; }
+
+      // Biodata
+      document.getElementById('b-ttl').value    = p.ttl    || '';
+      document.getElementById('b-alamat').value = p.alamat || '';
+      document.getElementById('b-hp').value     = p.hp     || '';
+      document.getElementById('b-ig').value     = p.ig     || '';
+      document.getElementById('b-nilai').value  = p.nilai  || '';
+      document.getElementById('b-hobi').value   = p.hobi   || '';
+      document.getElementById('b-cita').value   = p.cita   || '';
+
+      document.getElementById('upload-progress').textContent = '';
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    /* ============================================================
+       TUTUP MODAL
+    ============================================================ */
+    function closeModal(){
+      document.getElementById('modal-overlay').classList.remove('open');
+      activeSiswa = null;
+      pendingFotoBase64 = null;
+    }
+    function handleOverlayClick(e){
+      if(e.target===document.getElementById('modal-overlay')) closeModal();
+    }
+
+    /* ============================================================
+       UPLOAD FOTO — disimpan sebagai Base64 di Firebase
+       (Firebase Storage gratis tidak perlu billing)
+    ============================================================ */
+    function handleFotoUpload(event){
+      const file = event.target.files[0];
+      if(!file) return;
+
+      // Validasi ukuran max 2MB
+      if(file.size > 2*1024*1024){
+        showToast('❌ Foto terlalu besar! Max 2MB ya.'); return;
+      }
+
+      const progress = document.getElementById('upload-progress');
+      progress.textContent = 'Memproses foto...';
+
+      // Kompres & convert ke Base64 via canvas
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          // Resize ke max 400x400
+          const canvas = document.createElement('canvas');
+          const MAX = 400;
+          let w = img.width, h = img.height;
+          if(w > h){ if(w>MAX){h=h*(MAX/w);w=MAX;} }
+          else      { if(h>MAX){w=w*(MAX/h);h=MAX;} }
+          canvas.width=w; canvas.height=h;
+          canvas.getContext('2d').drawImage(img,0,0,w,h);
+          const base64 = canvas.toDataURL('image/jpeg', 0.75);
+          pendingFotoBase64 = base64;
+
+          // Preview langsung di modal
+          const fotoEl = document.getElementById('modal-foto');
+          const placEl = document.getElementById('modal-av-placeholder');
+          fotoEl.src = base64;
+          fotoEl.style.display = 'block';
+          placEl.style.display = 'none';
+          progress.textContent = '✅ Foto siap — klik Simpan Profil';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      // Reset input agar bisa upload ulang file sama
+      event.target.value = '';
+    }
+
+    /* ============================================================
+       SIMPAN PROFIL KE FIREBASE
+    ============================================================ */
+    function simpanProfil(){
+      if(!activeSiswa){ showToast('❌ Tidak ada siswa aktif.'); return; }
+
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="margin:0 auto"></div>';
+
+      const profil = {
+        nama   : activeSiswa.nama,
+        nis    : activeSiswa.nis,
+        jk     : activeSiswa.jk,
+        jabatan: activeSiswa.jabatan,
+        ttl    : document.getElementById('b-ttl').value.trim(),
+        alamat : document.getElementById('b-alamat').value.trim(),
+        hp     : document.getElementById('b-hp').value.trim(),
+        ig     : document.getElementById('b-ig').value.trim(),
+        nilai  : document.getElementById('b-nilai').value.trim(),
+        hobi   : document.getElementById('b-hobi').value.trim(),
+        cita   : document.getElementById('b-cita').value.trim(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Tambahkan foto jika ada yang baru diupload
+      if(pendingFotoBase64) profil.foto = pendingFotoBase64;
+      else if(profilData[activeSiswa.nis]?.foto) profil.foto = profilData[activeSiswa.nis].foto;
+
+      // Simpan ke Firebase Realtime Database
+      db.ref(`profil_siswa/${activeSiswa.nis}`).set(profil)
+        .then(() => {
+          showToast('✅ Profil berhasil disimpan!');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-cloud-check-fill" style="margin-right:0.5rem"></i>TERSIMPAN!';
+          setTimeout(() => {
+            btn.innerHTML = '<i class="bi bi-cloud-upload-fill" style="margin-right:0.5rem"></i>SIMPAN PROFIL';
+          }, 2000);
+          pendingFotoBase64 = null;
+        })
+        .catch(err => {
+          showToast('❌ Gagal simpan: ' + err.message);
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-cloud-upload-fill" style="margin-right:0.5rem"></i>SIMPAN PROFIL';
+        });
+    }
+
+    /* ============================================================
+       TOAST NOTIFIKASI
+    ============================================================ */
+    function showToast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,2174 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XI TKJ 1 — SMK IMELDA MEDAN</title>
+  <link rel="shortcut icon" href="https://uimedan.ac.id/uploads/setup/Wgv2svxKBHl25JLRy0uHThgY1iae5E0srQ8U2b9x.png">
+
+  <!-- ===================== EXTERNAL LIBRARIES ===================== -->
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- AOS Animation -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ===================== CSS VARIABLES & RESET ===================== */
+    :root {
+      --neon-blue: #00f0ff;
+      --neon-cyan: #00ffcc;
+      --neon-purple: #bf00ff;
+      --neon-pink: #ff00aa;
+      --dark-bg: #020818;
+      --dark-card: rgba(0, 240, 255, 0.04);
+      --border-neon: rgba(0, 240, 255, 0.25);
+      --glow-blue: 0 0 20px rgba(0,240,255,0.6), 0 0 60px rgba(0,240,255,0.2);
+      --glow-purple: 0 0 20px rgba(191,0,255,0.6), 0 0 60px rgba(191,0,255,0.2);
+      --glow-cyan: 0 0 20px rgba(0,255,204,0.6), 0 0 60px rgba(0,255,204,0.2);
+      --font-display: 'Orbitron', monospace;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-body: 'Rajdhani', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark-bg);
+      color: #e0f7ff;
+      font-family: var(--font-body);
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* ===================== CUSTOM CURSOR ===================== */
+    #cursor-dot {
+      width: 8px; height: 8px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 99999;
+      transition: transform 0.1s ease;
+      box-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-cyan);
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(0,240,255,0.6);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 99998;
+      transition: transform 0.12s ease, width 0.2s, height 0.2s, border-color 0.2s;
+    }
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring {
+      width: 56px; height: 56px;
+      border-color: var(--neon-purple);
+    }
+
+    /* ===================== LOADING SCREEN ===================== */
+    #loader {
+      position: fixed; inset: 0;
+      background: #000;
+      z-index: 99997;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    #loader.hide { opacity: 0; visibility: hidden; }
+    .loader-logo {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-blue);
+      letter-spacing: 0.3em;
+      animation: pulse-text 1s ease-in-out infinite alternate;
+    }
+    .loader-bar-wrap {
+      width: 300px; height: 3px;
+      background: rgba(0,240,255,0.1);
+      border-radius: 10px; margin-top: 2rem;
+      overflow: hidden;
+    }
+    .loader-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      border-radius: 10px;
+      width: 0%;
+      animation: load-progress 2.2s ease forwards;
+      box-shadow: var(--glow-blue);
+    }
+    .loader-pct {
+      font-family: var(--font-mono);
+      color: var(--neon-cyan);
+      margin-top: 0.7rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+    @keyframes load-progress { to { width: 100%; } }
+    @keyframes pulse-text {
+      from { text-shadow: 0 0 10px var(--neon-cyan); }
+      to   { text-shadow: 0 0 40px var(--neon-cyan), 0 0 80px var(--neon-blue); }
+    }
+
+    /* ===================== CANVAS & PARTICLES BACKGROUND ===================== */
+    #matrix-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0.07; z-index: 0;
+      pointer-events: none;
+    }
+    #particles-js {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1; pointer-events: none;
+    }
+
+    /* ===================== ANIMATED GRID OVERLAY ===================== */
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: grid-pan 20s linear infinite;
+    }
+    @keyframes grid-pan { to { background-position: 50px 50px; } }
+
+    /* ===================== NAVBAR ===================== */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      transition: all 0.4s ease;
+      padding: 1.2rem 0;
+    }
+    #navbar.scrolled {
+      background: rgba(2,8,24,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-neon);
+      padding: 0.7rem 0;
+      box-shadow: 0 4px 30px rgba(0,240,255,0.08);
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-decoration: none;
+      letter-spacing: 0.15em;
+      text-shadow: var(--glow-blue);
+      white-space: nowrap;
+    }
+    .nav-links {
+      display: flex; gap: 0.3rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: rgba(224,247,255,0.65);
+      text-decoration: none;
+      padding: 0.35rem 0.7rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all 0.25s ease;
+      letter-spacing: 0.08em;
+    }
+    .nav-links a:hover {
+      color: var(--neon-cyan);
+      border-color: var(--border-neon);
+      background: rgba(0,240,255,0.06);
+      text-shadow: 0 0 10px var(--neon-cyan);
+    }
+    .nav-clock {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.1em;
+      padding: 0.3rem 0.8rem;
+      border: 1px solid var(--border-neon);
+      border-radius: 6px;
+      background: rgba(0,240,255,0.04);
+      white-space: nowrap;
+    }
+    #hamburger {
+      display: none;
+      background: none; border: none; cursor: none;
+      font-size: 1.5rem; color: var(--neon-cyan);
+    }
+
+    /* ===================== HERO SECTION ===================== */
+    #home {
+      position: relative; z-index: 2;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 6rem 1.5rem 3rem;
+    }
+    .hero-content { position: relative; z-index: 3; max-width: 900px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--neon-cyan);
+      border: 1px solid var(--border-neon);
+      padding: 0.35rem 1rem;
+      border-radius: 100px;
+      background: rgba(0,240,255,0.05);
+      letter-spacing: 0.15em;
+      margin-bottom: 2rem;
+      animation: float-badge 3s ease-in-out infinite;
+    }
+    @keyframes float-badge {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: blink-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 8vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 1rem;
+    }
+    .hero-title .line1 {
+      display: block;
+      background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 50%, var(--neon-blue) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(0,240,255,0.4));
+    }
+    .hero-title .line2 {
+      display: block;
+      background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(191,0,255,0.4));
+    }
+    .hero-subtitle {
+      font-family: var(--font-mono);
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      color: rgba(224,247,255,0.6);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.1em;
+    }
+    .hero-typed-wrap {
+      font-family: var(--font-mono);
+      font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+      color: var(--neon-cyan);
+      margin-bottom: 2.5rem;
+      text-shadow: 0 0 20px var(--neon-cyan);
+    }
+    .hero-typed-wrap .prefix { color: rgba(224,247,255,0.4); }
+    #typed-text::after { content: '|'; animation: caret 0.8s step-end infinite; }
+    @keyframes caret { 0%,100%{opacity:1} 50%{opacity:0} }
+    .hero-cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-cyber {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 0.85rem 2rem;
+      border-radius: 6px;
+      cursor: none;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative; overflow: hidden;
+    }
+    .btn-cyber::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .btn-cyber:hover::before { transform: translateX(100%); }
+    .btn-primary-cyber {
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+      color: #000;
+      border: none;
+      box-shadow: 0 0 25px rgba(0,240,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .btn-primary-cyber:hover {
+      box-shadow: 0 0 45px rgba(0,240,255,0.7), 0 0 80px rgba(0,240,255,0.2);
+      transform: translateY(-2px);
+    }
+    .btn-outline-cyber {
+      background: transparent;
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0,240,255,0.5);
+    }
+    .btn-outline-cyber:hover {
+      background: rgba(0,240,255,0.08);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 25px rgba(0,240,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      animation: bounce-scroll 2s ease-in-out infinite;
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--neon-cyan), transparent);
+    }
+    @keyframes bounce-scroll { 0%,100%{opacity:1;transform:translateX(-50%) translateY(0)} 50%{opacity:0.5;transform:translateX(-50%) translateY(8px)} }
+
+    /* ===================== SECTION COMMON ===================== */
+    section { position: relative; z-index: 2; }
+    .section-inner { max-width: 1280px; margin: 0 auto; padding: 6rem 1.5rem; }
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .section-tag::before { content: '// '; opacity: 0.5; }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--neon-cyan), transparent);
+      margin-bottom: 3rem;
+      box-shadow: var(--glow-blue);
+    }
+    .section-desc {
+      font-size: 1rem;
+      color: rgba(224,247,255,0.6);
+      line-height: 1.8;
+      max-width: 600px;
+    }
+
+    /* ===================== GLASS CARD ===================== */
+    .glass-card {
+      background: var(--dark-card);
+      border: 1px solid var(--border-neon);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(12px);
+      transition: all 0.4s ease;
+      position: relative; overflow: hidden;
+    }
+    .glass-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+      opacity: 0.5;
+    }
+    .glass-card:hover {
+      border-color: rgba(0,240,255,0.5);
+      box-shadow: 0 8px 40px rgba(0,240,255,0.12), inset 0 0 30px rgba(0,240,255,0.02);
+      transform: translateY(-4px);
+    }
+
+    /* ===================== TENTANG KELAS ===================== */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 2rem; }
+    .stat-item {
+      padding: 1.2rem;
+      border: 1px solid var(--border-neon);
+      border-radius: 12px;
+      background: rgba(0,240,255,0.03);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .stat-item:hover { background: rgba(0,240,255,0.08); border-color: var(--neon-cyan); }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-blue);
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: rgba(224,247,255,0.5);
+      letter-spacing: 0.1em;
+      margin-top: 0.25rem;
+    }
+    .about-visual {
+      position: relative; display: flex; align-items: center; justify-content: center;
+    }
+    .cyber-hexagon {
+      width: 280px; height: 280px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(191,0,255,0.1));
+      border: 2px solid var(--border-neon);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 1rem;
+      animation: hex-rotate 8s linear infinite;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-blue);
+      text-align: center;
+      padding: 2rem;
+    }
+    @keyframes hex-rotate { 0%,100%{box-shadow:0 0 30px rgba(0,240,255,0.2)} 50%{box-shadow:0 0 60px rgba(191,0,255,0.3)} }
+    .hex-icon { font-size: 3rem; }
+
+    /* ===================== VISI MISI ===================== */
+    .visi-misi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .vm-card-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      margin-bottom: 1rem;
+      text-shadow: var(--glow-blue);
+    }
+    .vm-list { list-style: none; }
+    .vm-list li {
+      font-size: 0.95rem;
+      color: rgba(224,247,255,0.75);
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(0,240,255,0.07);
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      line-height: 1.6;
+    }
+    .vm-list li::before {
+      content: '▸';
+      color: var(--neon-cyan);
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+    }
+
+    /* ===================== DATA SISWA ===================== */
+    .siswa-search-wrap {
+      position: relative; max-width: 420px; margin-bottom: 2rem;
+    }
+    .siswa-search {
+      width: 100%; padding: 0.85rem 1rem 0.85rem 3rem;
+      background: rgba(0,240,255,0.04);
+      border: 1px solid var(--border-neon);
+      border-radius: 10px;
+      color: #e0f7ff;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .siswa-search:focus { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.15); }
+    .search-icon {
+      position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+      color: rgba(0,240,255,0.5); font-size: 1rem;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-neon);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: rgba(0,240,255,0.07);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      color: var(--neon-cyan);
+      padding: 1rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-neon);
+    }
+    tbody tr {
+      transition: background 0.2s;
+      border-bottom: 1px solid rgba(0,240,255,0.05);
+    }
+    tbody tr:hover { background: rgba(0,240,255,0.04); }
+    tbody td {
+      padding: 0.9rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: rgba(224,247,255,0.75);
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 100px;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+    .badge-active { background: rgba(0,255,153,0.1); color: #00ff99; border: 1px solid rgba(0,255,153,0.3); }
+    .badge-ketua  { background: rgba(191,0,255,0.1); color: var(--neon-purple); border: 1px solid rgba(191,0,255,0.3); }
+
+    /* ===================== WALI KELAS ===================== */
+    .guru-card {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; max-width: 380px; margin: 0 auto;
+    }
+    .guru-avatar {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      border: 3px solid var(--neon-cyan);
+      background: linear-gradient(135deg, rgba(0,240,255,0.15), rgba(191,0,255,0.15));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; color: var(--neon-cyan);
+      margin-bottom: 1.5rem;
+      box-shadow: var(--glow-blue);
+      animation: avatar-glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes avatar-glow {
+      from { box-shadow: 0 0 20px rgba(0,240,255,0.4); }
+      to   { box-shadow: 0 0 50px rgba(191,0,255,0.5), 0 0 20px rgba(0,240,255,0.3); }
+    }
+    .guru-name {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .guru-role {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.1em;
+      margin-bottom: 1.5rem;
+    }
+    .guru-info-list { width: 100%; list-style: none; }
+    .guru-info-list li {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid rgba(0,240,255,0.07);
+      font-size: 0.88rem;
+      color: rgba(224,247,255,0.7);
+    }
+    .guru-info-list li i { color: var(--neon-cyan); font-size: 1rem; }
+
+    /* ===================== JADWAL PELAJARAN ===================== */
+    .jadwal-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .tab-btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-neon);
+      background: transparent;
+      color: rgba(224,247,255,0.6);
+      cursor: none;
+      transition: all 0.25s;
+      letter-spacing: 0.08em;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(0,240,255,0.1);
+      color: var(--neon-cyan);
+      border-color: rgba(0,240,255,0.5);
+    }
+    .jadwal-content { display: none; }
+    .jadwal-content.active { display: block; animation: fade-in 0.3s ease; }
+    @keyframes fade-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .jadwal-item {
+      display: flex; align-items: center; gap: 1.5rem;
+      padding: 1rem 1.2rem;
+      border: 1px solid rgba(0,240,255,0.07);
+      border-radius: 10px; margin-bottom: 0.7rem;
+      background: rgba(0,240,255,0.02);
+      transition: all 0.3s;
+    }
+    .jadwal-item:hover { background: rgba(0,240,255,0.06); border-color: var(--border-neon); }
+    .jadwal-time {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      min-width: 110px;
+      letter-spacing: 0.05em;
+    }
+    .jadwal-subject {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #e0f7ff;
+    }
+    .jadwal-guru { font-size: 0.78rem; color: rgba(224,247,255,0.45); margin-top: 0.1rem; }
+    .jadwal-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: rgba(0,240,255,0.4);
+      margin-left: auto;
+    }
+
+    /* ===================== GALERI ===================== */
+    .galeri-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .galeri-item {
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border-neon);
+      cursor: none;
+      transition: all 0.4s ease;
+    }
+    .galeri-item:hover { transform: scale(1.03); box-shadow: 0 10px 40px rgba(0,240,255,0.2); border-color: var(--neon-cyan); }
+    .galeri-bg {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.5rem;
+      font-size: 2.5rem;
+    }
+    .galeri-overlay {
+      position: absolute; inset: 0;
+      background: rgba(2,8,24,0.7);
+      display: flex; align-items: flex-end;
+      padding: 1rem;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .galeri-item:hover .galeri-overlay { opacity: 1; }
+    .galeri-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.08em;
+    }
+
+    /* ===================== STRUKTUR ORGANISASI ===================== */
+    .org-tree {
+      display: flex; flex-direction: column; align-items: center; gap: 2rem;
+    }
+    .org-level { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+    .org-card {
+      padding: 1rem 1.5rem;
+      border: 1px solid var(--border-neon);
+      border-radius: 12px;
+      background: rgba(0,240,255,0.04);
+      text-align: center; min-width: 150px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .org-card::before {
+      content: '';
+      position: absolute; top: -1px; left: 0; right: 0;
+      height: 2px;
+      border-radius: 2px 2px 0 0;
+    }
+    .org-card.top::before { background: linear-gradient(90deg, var(--neon-cyan), var(--neon-blue)); }
+    .org-card.mid::before { background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink)); }
+    .org-card.bot::before { background: linear-gradient(90deg, rgba(0,240,255,0.5), transparent); }
+    .org-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,240,255,0.1); }
+    .org-role {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.12em; margin-bottom: 0.3rem;
+    }
+    .org-name { font-weight: 700; font-size: 0.9rem; color: #fff; }
+    .org-connector { width: 1px; height: 30px; background: var(--border-neon); }
+
+    /* ===================== STATISTIK ===================== */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+    .stat-card {
+      padding: 1.8rem;
+      border: 1px solid var(--border-neon);
+      border-radius: 16px;
+      background: rgba(0,240,255,0.03);
+      text-align: center;
+      position: relative; overflow: hidden;
+      transition: all 0.4s;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+      transform: scaleX(0); transition: transform 0.4s;
+    }
+    .stat-card:hover::after { transform: scaleX(1); }
+    .stat-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,240,255,0.12); }
+    .stat-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-blue);
+      line-height: 1;
+    }
+    .stat-title {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: rgba(224,247,255,0.5);
+      margin-top: 0.5rem;
+    }
+    .stat-bar { width: 100%; height: 3px; background: rgba(0,240,255,0.1); border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+    .stat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); border-radius: 2px; }
+
+    /* ===================== QUOTES ===================== */
+    .quotes-slider { position: relative; }
+    .quote-card {
+      text-align: center;
+      padding: 3rem 2rem;
+      max-width: 750px; margin: 0 auto;
+    }
+    .quote-mark {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      color: var(--neon-cyan);
+      line-height: 0.5;
+      opacity: 0.4;
+      margin-bottom: 1.5rem;
+    }
+    .quote-text {
+      font-family: var(--font-body);
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      font-style: italic;
+      color: rgba(224,247,255,0.85);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .quote-author {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.2em;
+    }
+    .quote-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 2rem; }
+    .quote-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(0,240,255,0.2); cursor: none;
+      transition: all 0.3s;
+    }
+    .quote-dot.active { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+
+    /* ===================== PESAN ANONIM ===================== */
+    .pesan-form { max-width: 600px; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(0,240,255,0.7);
+      letter-spacing: 0.12em;
+      margin-bottom: 0.5rem;
+    }
+    .form-control {
+      width: 100%; padding: 0.85rem 1rem;
+      background: rgba(0,240,255,0.04);
+      border: 1px solid var(--border-neon);
+      border-radius: 10px;
+      color: #e0f7ff;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      outline: none;
+      transition: all 0.3s;
+      resize: none;
+    }
+    .form-control:focus { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(0,240,255,0.1); }
+    .form-control::placeholder { color: rgba(224,247,255,0.25); }
+    .pesan-list { margin-top: 2.5rem; }
+    .pesan-item {
+      padding: 1.25rem;
+      border: 1px solid rgba(0,240,255,0.08);
+      border-radius: 12px;
+      background: rgba(0,240,255,0.02);
+      margin-bottom: 1rem;
+      animation: slide-in 0.4s ease;
+    }
+    @keyframes slide-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+    .pesan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .pesan-from {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.1em;
+    }
+    .pesan-time { font-family: var(--font-mono); font-size: 0.62rem; color: rgba(224,247,255,0.3); }
+    .pesan-body { font-size: 0.92rem; color: rgba(224,247,255,0.8); line-height: 1.6; }
+
+    /* ===================== CHAT REALTIME ===================== */
+    .chat-wrap {
+      border: 1px solid var(--border-neon);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 700px;
+      background: rgba(0,240,255,0.02);
+    }
+    .chat-header {
+      padding: 1rem 1.5rem;
+      background: rgba(0,240,255,0.06);
+      border-bottom: 1px solid var(--border-neon);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .chat-status { width: 8px; height: 8px; border-radius: 50%; background: #00ff99; box-shadow: 0 0 8px #00ff99; animation: blink-dot 1.5s infinite; }
+    .chat-title { font-family: var(--font-mono); font-size: 0.75rem; color: var(--neon-cyan); letter-spacing: 0.1em; }
+    .chat-messages {
+      height: 320px; overflow-y: auto;
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+    .chat-msg {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      animation: slide-in 0.3s ease;
+    }
+    .chat-msg.sent { flex-direction: row-reverse; }
+    .chat-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; flex-shrink: 0;
+      font-family: var(--font-mono);
+    }
+    .chat-avatar.recv { background: rgba(0,240,255,0.1); border: 1px solid var(--border-neon); color: var(--neon-cyan); }
+    .chat-avatar.sent-av { background: rgba(191,0,255,0.1); border: 1px solid rgba(191,0,255,0.3); color: var(--neon-purple); }
+    .chat-bubble {
+      max-width: 70%; padding: 0.75rem 1rem;
+      border-radius: 14px;
+      font-size: 0.85rem; line-height: 1.5;
+    }
+    .chat-bubble.recv {
+      background: rgba(0,240,255,0.06);
+      border: 1px solid rgba(0,240,255,0.1);
+      color: rgba(224,247,255,0.9);
+    }
+    .chat-bubble.sent-b {
+      background: rgba(191,0,255,0.1);
+      border: 1px solid rgba(191,0,255,0.2);
+      color: rgba(224,247,255,0.9);
+    }
+    .chat-bubble .chat-sender { font-family: var(--font-mono); font-size: 0.62rem; color: var(--neon-cyan); margin-bottom: 0.2rem; }
+    .chat-input-wrap {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-neon);
+      display: flex; gap: 0.75rem;
+    }
+    .chat-input {
+      flex: 1; padding: 0.7rem 1rem;
+      background: rgba(0,240,255,0.04);
+      border: 1px solid var(--border-neon);
+      border-radius: 10px;
+      color: #e0f7ff;
+      font-family: var(--font-mono); font-size: 0.8rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .chat-input:focus { border-color: var(--neon-cyan); }
+    .chat-send {
+      padding: 0.7rem 1.2rem;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+      border: none; border-radius: 10px;
+      color: #000; font-size: 1rem;
+      cursor: none; transition: all 0.3s;
+    }
+    .chat-send:hover { box-shadow: var(--glow-blue); transform: scale(1.05); }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      position: relative; z-index: 2;
+      border-top: 1px solid var(--border-neon);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      background: rgba(0,240,255,0.015);
+    }
+    .footer-inner { max-width: 1280px; margin: 0 auto; }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-blue);
+      letter-spacing: 0.2em;
+      margin-bottom: 0.5rem;
+    }
+    .footer-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(224,247,255,0.4);
+      letter-spacing: 0.15em;
+      margin-bottom: 2rem;
+    }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: rgba(224,247,255,0.45);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--neon-cyan); }
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: rgba(224,247,255,0.25);
+      letter-spacing: 0.1em;
+    }
+    .footer-copy span { color: var(--neon-cyan); }
+
+    /* ===================== BACK TO TOP ===================== */
+    #btt {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 900;
+      width: 44px; height: 44px;
+      background: rgba(0,240,255,0.1);
+      border: 1px solid var(--border-neon);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--neon-cyan); font-size: 1.2rem;
+      cursor: none; text-decoration: none;
+      opacity: 0; transform: translateY(10px);
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    #btt.visible { opacity: 1; transform: translateY(0); }
+    #btt:hover { background: rgba(0,240,255,0.2); box-shadow: var(--glow-blue); transform: translateY(-3px); }
+
+    /* ===================== MOBILE NAV ===================== */
+    #mobile-nav {
+      display: none;
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 280px;
+      background: rgba(2,8,24,0.98);
+      backdrop-filter: blur(30px);
+      border-left: 1px solid var(--border-neon);
+      z-index: 1001;
+      padding: 5rem 1.5rem 2rem;
+      flex-direction: column; gap: 0.5rem;
+      transition: transform 0.4s ease;
+      transform: translateX(100%);
+    }
+    #mobile-nav.open { display: flex; transform: translateX(0); }
+    #mobile-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: rgba(224,247,255,0.7);
+      text-decoration: none;
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.25s;
+      letter-spacing: 0.08em;
+    }
+    #mobile-nav a:hover {
+      color: var(--neon-cyan);
+      border-color: var(--border-neon);
+      background: rgba(0,240,255,0.06);
+    }
+    #nav-overlay {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    }
+
+    /* ===================== NEON SECTION DIVIDERS ===================== */
+    .neon-divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-neon), transparent);
+      position: relative; z-index: 2;
+    }
+
+    /* ===================== ANIMATED BACKGROUND ORBS ===================== */
+    .bg-orb {
+      position: fixed; border-radius: 50%;
+      filter: blur(100px); pointer-events: none; z-index: 0;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,240,255,0.06) 0%, transparent 70%);
+      top: -200px; left: -200px;
+      animation: orb-drift 15s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(191,0,255,0.06) 0%, transparent 70%);
+      bottom: 0; right: -100px;
+      animation: orb-drift 18s ease-in-out infinite reverse;
+    }
+    @keyframes orb-drift {
+      0%,100%{transform:translate(0,0)}
+      33%{transform:translate(50px,-30px)}
+      66%{transform:translate(-30px,40px)}
+    }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 1024px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .visi-misi-grid { grid-template-columns: 1fr; }
+      .cyber-hexagon { width: 220px; height: 220px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      #hamburger { display: block; }
+      .nav-clock { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .galeri-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .galeri-grid { grid-template-columns: 1fr; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .hero-cta-group { flex-direction: column; align-items: center; }
+      .btn-cyber { width: 100%; text-align: center; }
+    }
+
+    /* ===================== RIPPLE EFFECT ===================== */
+    .ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(0,240,255,0.3);
+      animation: ripple-out 0.6s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple-out {
+      from { width: 0; height: 0; opacity: 1; }
+      to   { width: 200px; height: 200px; opacity: 0; margin-left: -100px; margin-top: -100px; }
+    }
+
+    /* ===================== KALENDER ===================== */
+    .cal-wrap {
+      max-width: 350px;
+      border: 1px solid var(--border-neon);
+      border-radius: 16px; overflow: hidden;
+      background: rgba(0,240,255,0.03);
+    }
+    .cal-header {
+      padding: 1rem 1.5rem;
+      background: rgba(0,240,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cal-month {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--neon-cyan);
+      letter-spacing: 0.1em;
+    }
+    .cal-nav { background: none; border: none; color: var(--neon-cyan); cursor: none; font-size: 1rem; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; padding: 1rem; }
+    .cal-day-name {
+      text-align: center; font-family: var(--font-mono);
+      font-size: 0.6rem; color: rgba(224,247,255,0.35);
+      padding: 0.4rem; letter-spacing: 0.05em;
+    }
+    .cal-date {
+      text-align: center; font-family: var(--font-mono);
+      font-size: 0.72rem; padding: 0.45rem;
+      border-radius: 6px; cursor: none;
+      transition: all 0.2s; color: rgba(224,247,255,0.6);
+    }
+    .cal-date:hover { background: rgba(0,240,255,0.1); color: var(--neon-cyan); }
+    .cal-date.today {
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+      color: #000; font-weight: 700;
+      box-shadow: var(--glow-blue);
+    }
+    .cal-date.empty { opacity: 0; }
+
+    /* ===================== SCAN LINE OVERLAY ===================== */
+    .scan-lines {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================== BACKGROUND LAYERS ===================== -->
+  <canvas id="matrix-canvas"></canvas>
+  <div id="particles-js"></div>
+  <div class="grid-overlay"></div>
+  <div class="scan-lines"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <!-- ===================== CUSTOM CURSOR ===================== -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ===================== LOADING SCREEN ===================== -->
+  <div id="loader">
+    <div class="loader-logo">XI TKJ 1 // IMELDA</div>
+    <div style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(0,240,255,0.4);letter-spacing:0.2em;margin-top:0.5rem;">INITIALIZING SYSTEM...</div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar"></div>
+    </div>
+    <div class="loader-pct" id="loader-pct">0%</div>
+  </div>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#home" class="nav-brand">XI_TKJ1.OFFICIAL</a>
+      <ul class="nav-links">
+        <li><a href="#home">HOME</a></li>
+        <li><a href="#tentang">TENTANG</a></li>
+        <li><a href="#visi-misi">VISI-MISI</a></li>
+        <li><a href="#siswa">SISWA</a></li>
+        <li><a href="#guru">GURU</a></li>
+        <li><a href="#jadwal">JADWAL</a></li>
+        <li><a href="galery.html">GALERI</a></li>
+        <li><a href="#organisasi">ORG</a></li>
+        <li><a href="#statistik">STATS</a></li>
+        <li><a href="#pesan">PESAN</a></li>
+        <li><a href="#chat">CHAT</a></li>
+      </ul>
+      <div class="nav-clock" id="nav-clock">00:00:00</div>
+      <button id="hamburger" onclick="toggleMobileNav()"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div id="nav-overlay" onclick="toggleMobileNav()"></div>
+  <div id="mobile-nav">
+    <a href="#home" onclick="closeMobileNav()">// HOME</a>
+    <a href="#tentang" onclick="closeMobileNav()">// TENTANG KELAS</a>
+    <a href="#visi-misi" onclick="closeMobileNav()">// VISI & MISI</a>
+    <a href="#siswa" onclick="closeMobileNav()">// DATA SISWA</a>
+    <a href="#guru" onclick="closeMobileNav()">// WALI KELAS</a>
+    <a href="#jadwal" onclick="closeMobileNav()">// JADWAL</a>
+    <a href="galery.html" onclick="closeMobileNav()">// GALERI</a>
+    <a href="#organisasi" onclick="closeMobileNav()">// ORGANISASI</a>
+    <a href="#statistik" onclick="closeMobileNav()">// STATISTIK</a>
+    <a href="#quotes" onclick="closeMobileNav()">// QUOTES</a>
+    <a href="#pesan" onclick="closeMobileNav()">// PESAN ANONIM</a>
+    <a href="#chat" onclick="closeMobileNav()">// CHAT</a>
+  </div>
+
+  <!-- ===================== HERO SECTION ===================== -->
+  <section id="home">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        SMKS IMELDA MEDAN • TA 2024/2025
+      </div>
+      <h1 class="hero-title">
+        <span class="line1">XI TKJ 1</span>
+        <span class="line2">SMK IMELDA</span>
+      </h1>
+      <p class="hero-subtitle">TEKNIK KOMPUTER DAN JARINGAN • MEDAN, SUMATERA UTARA</p>
+      <div class="hero-typed-wrap">
+        <span class="prefix">&gt; </span>
+        <span id="typed-text"></span>
+      </div>
+      <div class="hero-cta-group">
+        <a href="explore-kelas.html" class="btn-cyber btn-primary-cyber">
+          <i class="bi bi-cpu-fill" style="margin-right:0.5rem"></i>EXPLORE KELAS
+        </a>
+        <a href="profil-siswa.html" class="btn-cyber btn-outline-cyber">
+          <i class="bi bi-people-fill" style="margin-right:0.5rem"></i>DATA SISWA
+        </a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== TENTANG KELAS ===================== -->
+  <section id="tentang">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div data-aos="fade-right">
+          <p class="section-tag">01 - TENTANG KAMI</p>
+          <h2 class="section-title">Kelas <span>Terbaik</span><br>di IMELDA</h2>
+          <div class="section-divider"></div>
+          <p class="section-desc">
+            XI TKJ 1 adalah kelas unggulan jurusan Teknik Komputer dan Jaringan di SMK Imelda Medan.
+            Kami adalah generasi teknologi yang siap menghadapi tantangan era digital dengan semangat
+            belajar yang tinggi dan semangat kolaborasi yang kuat.
+          </p>
+          <div class="about-stats">
+            <div class="stat-item" data-aos="zoom-in" data-aos-delay="100">
+              <div class="stat-num" data-target="36">0</div>
+              <div class="stat-label">TOTAL SISWA</div>
+            </div>
+            <div class="stat-item" data-aos="zoom-in" data-aos-delay="200">
+              <div class="stat-num" data-target="18">0</div>
+              <div class="stat-label">SISWA PUTRA</div>
+            </div>
+            <div class="stat-item" data-aos="zoom-in" data-aos-delay="300">
+              <div class="stat-num" data-target="18">0</div>
+              <div class="stat-label">SISWA PUTRI</div>
+            </div>
+            <div class="stat-item" data-aos="zoom-in" data-aos-delay="400">
+              <div class="stat-num" data-target="2024">0</div>
+              <div class="stat-label">TAHUN AJARAN</div>
+            </div>
+          </div>
+        </div>
+        <div class="about-visual" data-aos="fade-left">
+          <div class="cyber-hexagon">
+            <div class="hex-icon">🖥️</div>
+            <div>XI TKJ 1</div>
+            <div style="font-size:0.65rem;opacity:0.6;font-family:var(--font-mono)">SMK IMELDA<br>MEDAN</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== VISI & MISI ===================== -->
+  <section id="visi-misi">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:3.5rem" data-aos="fade-up">
+        <p class="section-tag" style="justify-content:center">02 - VISI & MISI</p>
+        <h2 class="section-title">Tujuan & <span>Komitmen</span><br>Kami</h2>
+        <div class="section-divider" style="margin:1rem auto 0"></div>
+      </div>
+      <div class="visi-misi-grid">
+        <div class="glass-card" data-aos="fade-right">
+          <i class="bi bi-eye-fill" style="font-size:2rem;color:var(--neon-cyan);text-shadow:var(--glow-blue);margin-bottom:1rem;display:block"></i>
+          <div class="vm-card-title">VISI</div>
+          <p style="font-size:0.95rem;color:rgba(224,247,255,0.8);line-height:1.8;font-style:italic">
+            "Menjadi kelas unggulan yang melahirkan teknisi jaringan komputer yang kompeten, berkarakter,
+            dan siap menghadapi revolusi industri 4.0 dengan pondasi iman dan ilmu yang kuat."
+          </p>
+        </div>
+        <div class="glass-card" data-aos="fade-left">
+          <i class="bi bi-lightning-charge-fill" style="font-size:2rem;color:var(--neon-purple);text-shadow:var(--glow-purple);margin-bottom:1rem;display:block"></i>
+          <div class="vm-card-title" style="color:var(--neon-purple)">MISI</div>
+          <ul class="vm-list">
+            <li>Menumbuhkan semangat belajar dan rasa ingin tahu yang tinggi di bidang TKJ</li>
+            <li>Meningkatkan keterampilan praktis dalam jaringan komputer, keamanan siber, dan server</li>
+            <li>Membangun kerja sama tim yang solid dan saling mendukung antar siswa</li>
+            <li>Mendorong inovasi dan kreativitas melalui proyek teknologi nyata</li>
+            <li>Membentuk karakter disiplin, tanggung jawab, dan profesionalisme</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== DATA SISWA ===================== -->
+  <section id="siswa">
+    <div class="section-inner">
+      <div data-aos="fade-up" style="margin-bottom:2.5rem">
+        <p class="section-tag">03 - DATABASE</p>
+        <h2 class="section-title">Data <span>Siswa</span></h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="siswa-search-wrap" data-aos="fade-up">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="siswa-search" id="siswa-search" placeholder="Cari nama siswa..." oninput="filterSiswa(this.value)" />
+      </div>
+      <div class="table-wrap" data-aos="fade-up">
+        <table id="siswa-table">
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>NAMA SISWA</th>
+              <th>NIS</th>
+              <th>L/P</th>
+              <th>JABATAN</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody id="siswa-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== WALI KELAS ===================== -->
+  <section id="guru">
+    <div class="section-inner" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+      <div data-aos="fade-right">
+        <p class="section-tag">04 - WALI KELAS</p>
+        <h2 class="section-title">Guru <span>Pembimbing</span><br>Kami</h2>
+        <div class="section-divider"></div>
+        <p class="section-desc">
+          Dibimbing oleh tenaga pengajar yang berpengalaman dan berdedikasi tinggi dalam
+          dunia Teknik Komputer dan Jaringan. Beliau adalah inspirasi kami setiap hari.
+        </p>
+        <div style="margin-top:2rem">
+          <div class="glass-card" style="padding:1.5rem">
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(0,240,255,0.5);letter-spacing:0.15em;margin-bottom:1rem">SKILL SET</div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+              <span style="background:rgba(0,240,255,0.08);border:1px solid var(--border-neon);padding:0.25rem 0.75rem;border-radius:100px;font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-cyan)">Networking</span>
+              <span style="background:rgba(191,0,255,0.08);border:1px solid rgba(191,0,255,0.2);padding:0.25rem 0.75rem;border-radius:100px;font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-purple)">Cisco CCNA</span>
+              <span style="background:rgba(0,240,255,0.08);border:1px solid var(--border-neon);padding:0.25rem 0.75rem;border-radius:100px;font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-cyan)">Linux Server</span>
+              <span style="background:rgba(0,255,204,0.08);border:1px solid rgba(0,255,204,0.2);padding:0.25rem 0.75rem;border-radius:100px;font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-cyan)">MikroTik</span>
+              <span style="background:rgba(0,240,255,0.08);border:1px solid var(--border-neon);padding:0.25rem 0.75rem;border-radius:100px;font-family:var(--font-mono);font-size:0.65rem;color:var(--neon-cyan)">Cyber Security</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-aos="fade-left">
+        <div class="guru-card glass-card">
+          <div class="guru-avatar"><i class="bi bi-person-badge-fill"></i></div>
+          <div class="guru-name">Buk Erfina karamoy</div>
+          <div class="guru-role">// WALI KELAS XI TKJ 1</div>
+          <ul class="guru-info-list">
+            <li><i class="bi bi-mortarboard-fill"></i> Teknik Informatika — SMK IMELDA Medan</li>
+            <li><i class="bi bi-briefcase-fill"></i> Pengalaman Mengajar 12 Tahun</li>
+            <li><i class="bi bi-award-fill"></i> Certified Cisco Network Associate</li>
+            <li><i class="bi bi-envelope-fill"></i> ahmad.fauzi@smkimelda.sch.id</li>
+            <li><i class="bi bi-telephone-fill"></i> +62 812-XXXX-XXXX</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== JADWAL PELAJARAN ===================== -->
+  <section id="jadwal">
+    <div class="section-inner">
+      <div data-aos="fade-up" style="margin-bottom:2.5rem">
+        <p class="section-tag">05 - SCHEDULE</p>
+        <h2 class="section-title">Jadwal <span>Pelajaran</span></h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="jadwal-tabs" data-aos="fade-up">
+        <button class="tab-btn active" onclick="switchTab(this,'senin')">SENIN</button>
+        <button class="tab-btn" onclick="switchTab(this,'selasa')">SELASA</button>
+        <button class="tab-btn" onclick="switchTab(this,'rabu')">RABU</button>
+        <button class="tab-btn" onclick="switchTab(this,'kamis')">KAMIS</button>
+        <button class="tab-btn" onclick="switchTab(this,'jumat')">JUM'AT</button>
+      </div>
+      <div id="jadwal-panels" data-aos="fade-up"></div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== GALERI FOTO ===================== -->
+  <section id="galeri">
+    <div class="section-inner">
+      <div data-aos="fade-up" style="margin-bottom:3rem;text-align:center">
+        <p class="section-tag" style="justify-content:center">06 - GALERI</p>
+        <h2 class="section-title">Momen <span>Bersama</span></h2>
+        <div class="section-divider" style="margin:1rem auto 0"></div>
+      </div>
+      <div class="galeri-grid" id="galeri-grid"></div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== STRUKTUR ORGANISASI ===================== -->
+  <section id="organisasi">
+    <div class="section-inner">
+      <div data-aos="fade-up" style="margin-bottom:3rem;text-align:center">
+        <p class="section-tag" style="justify-content:center">07 - STRUKTUR</p>
+        <h2 class="section-title">Struktur <span>Organisasi</span></h2>
+        <div class="section-divider" style="margin:1rem auto 0"></div>
+      </div>
+      <div class="org-tree" data-aos="fade-up">
+        <div class="org-level">
+          <div class="org-card top">
+            <div class="org-role">WALI KELAS</div>
+            <div class="org-name">Buk Erfina Karamoy</div>
+          </div>
+        </div>
+        <div class="org-connector"></div>
+        <div class="org-level">
+          <div class="org-card mid">
+            <div class="org-role">KETUA KELAS</div>
+            <div class="org-name">Trytian Variansyah</div>
+          </div>
+        </div>
+        <div class="org-connector"></div>
+        <div class="org-level">
+          <div class="org-card mid">
+            <div class="org-role">WAKIL KETUA</div>
+            <div class="org-name">Ingky Aldewa</div>
+          </div>
+          <div class="org-card mid">
+            <div class="org-role">SEKRETARIS</div>
+            <div class="org-name">Intan Khairizah</div>
+          </div>
+          <div class="org-card mid">
+            <div class="org-role">BENDAHARA</div>
+            <div class="org-name">Defi Efinisyah</div>
+          </div>
+        </div>
+        <div class="org-connector"></div>
+        <div class="org-level">
+          <div class="org-card bot">
+            <div class="org-role">SEKSI KEBERSIHAN</div>
+            <div class="org-name">Rina & Aldi</div>
+          </div>
+          <div class="org-card bot">
+            <div class="org-role">SEKSI KEAMANAN</div>
+            <div class="org-name">Budi & Wahyu</div>
+          </div>
+          <div class="org-card bot">
+            <div class="org-role">SEKSI HUMAS</div>
+            <div class="org-name">Novi & Eko</div>
+          </div>
+          <div class="org-card bot">
+            <div class="org-role">SEKSI OLAHRAGA</div>
+            <div class="org-name">Hendra & Putri</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== STATISTIK KELAS ===================== -->
+  <section id="statistik">
+    <div class="section-inner">
+      <div data-aos="fade-up" style="margin-bottom:3rem;text-align:center">
+        <p class="section-tag" style="justify-content:center">08 - ANALYTICS</p>
+        <h2 class="section-title">Statistik <span>Kelas</span></h2>
+        <div class="section-divider" style="margin:1rem auto 0"></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card glass-card" data-aos="zoom-in" data-aos-delay="0">
+          <div class="stat-icon">📊</div>
+          <div class="stat-value" data-target="92">0</div>
+          <div class="stat-title">RATA-RATA NILAI</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:92%"></div></div>
+        </div>
+        <div class="stat-card glass-card" data-aos="zoom-in" data-aos-delay="100">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" data-target="96">0</div>
+          <div class="stat-title">KEHADIRAN (80%)</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:96%"></div></div>
+        </div>
+        <div class="stat-card glass-card" data-aos="zoom-in" data-aos-delay="200">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-value" data-target="8">0</div>
+          <div class="stat-title">PRESTASI JUARA</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:80%"></div></div>
+        </div>
+        <div class="stat-card glass-card" data-aos="zoom-in" data-aos-delay="300">
+          <div class="stat-icon">💡</div>
+          <div class="stat-value" data-target="12">0</div>
+          <div class="stat-title">PROYEK SELESAI</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:75%"></div></div>
+        </div>
+      </div>
+      <!-- Kalender + Jam Digital -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;align-items:start">
+        <div data-aos="fade-right">
+          <div class="glass-card" style="text-align:center">
+            <div style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(0,240,255,0.5);letter-spacing:0.2em;margin-bottom:1.5rem">// JAM DIGITAL</div>
+            <div id="digital-clock" style="font-family:var(--font-display);font-size:clamp(2rem,6vw,3.5rem);font-weight:700;color:var(--neon-cyan);text-shadow:var(--glow-blue);letter-spacing:0.1em">00:00:00</div>
+            <div id="digital-date" style="font-family:var(--font-mono);font-size:0.75rem;color:rgba(224,247,255,0.4);margin-top:0.75rem;letter-spacing:0.1em">--</div>
+          </div>
+        </div>
+        <div data-aos="fade-left">
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calPrev()"><i class="bi bi-chevron-left"></i></button>
+              <div class="cal-month" id="cal-month-label">JANUARI 2025</div>
+              <button class="cal-nav" onclick="calNext()"><i class="bi bi-chevron-right"></i></button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== QUOTES MOTIVASI ===================== -->
+  <section id="quotes">
+    <div class="section-inner">
+      <div data-aos="fade-up" style="margin-bottom:2rem;text-align:center">
+        <p class="section-tag" style="justify-content:center">09 - INSPIRASI</p>
+        <h2 class="section-title">Quotes <span>Motivasi</span></h2>
+        <div class="section-divider" style="margin:1rem auto 0"></div>
+      </div>
+      <div class="glass-card" data-aos="fade-up">
+        <div class="quotes-slider">
+          <div id="quote-display" class="quote-card">
+            <div class="quote-mark">"</div>
+            <p class="quote-text" id="q-text">Loading...</p>
+            <div class="quote-author" id="q-author">—</div>
+          </div>
+          <div class="quote-dots" id="quote-dots"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== PESAN ANONIM ===================== -->
+  <section id="pesan">
+    <div class="section-inner">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start">
+        <div data-aos="fade-right">
+          <p class="section-tag">10 - ANONYMOUS</p>
+          <h2 class="section-title">Pesan <span>Anonim</span></h2>
+          <div class="section-divider"></div>
+          <p class="section-desc" style="margin-bottom:2rem">Kirim pesan atau masukan tanpa harus mengungkap identitasmu. Setiap suara penting bagi kami.</p>
+          <div class="pesan-form">
+            <div class="form-group">
+              <label class="form-label">NAMA (OPSIONAL)</label>
+              <input type="text" class="form-control" id="pesan-nama" placeholder="Anonymous" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">PESAN KAMU</label>
+              <textarea class="form-control" id="pesan-text" rows="4" placeholder="Tulis pesanmu di sini..."></textarea>
+            </div>
+            <button class="btn-cyber btn-primary-cyber" onclick="kirimPesan()" style="position:relative;overflow:hidden" id="btn-kirim">
+              <i class="bi bi-send-fill" style="margin-right:0.5rem"></i>KIRIM PESAN
+            </button>
+          </div>
+        </div>
+        <div data-aos="fade-left">
+          <div style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(0,240,255,0.5);letter-spacing:0.2em;margin-bottom:1.5rem">// PESAN MASUK</div>
+          <div class="pesan-list" id="pesan-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== CHAT REALTIME ===================== -->
+  <section id="chat">
+    <div class="section-inner" style="max-width:800px">
+      <div data-aos="fade-up" style="margin-bottom:2.5rem;text-align:center">
+        <p class="section-tag" style="justify-content:center">11 - LIVE CHAT</p>
+        <h2 class="section-title">Chat <span>Realtime</span></h2>
+        <div class="section-divider" style="margin:1rem auto 0"></div>
+      </div>
+      <div class="chat-wrap" data-aos="fade-up">
+        <div class="chat-header">
+          <div class="chat-status"></div>
+          <div class="chat-title">XI TKJ 1 GROUP CHAT — ONLINE</div>
+          <div style="margin-left:auto;font-family:var(--font-mono);font-size:0.62rem;color:rgba(224,247,255,0.3)" id="chat-count">36 MEMBERS</div>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-wrap">
+          <input type="text" class="chat-input" id="chat-input" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter')sendChat()" />
+          <input type="text" class="chat-input" id="chat-name" placeholder="Nama" style="max-width:110px" />
+          <button class="chat-send" onclick="sendChat()"><i class="bi bi-send-fill"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="neon-divider"></div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">XI TKJ 1</div>
+      <div class="footer-sub">SMK IMELDA MEDAN • TEKNIK KOMPUTER DAN JARINGAN</div>
+      <div class="footer-links">
+        <a href="#home">HOME</a>
+        <a href="#tentang">TENTANG</a>
+        <a href="#siswa">SISWA</a>
+        <a href="#guru">GURU</a>
+        <a href="#jadwal">JADWAL</a>
+        <a href="galery.html">GALERI</a>
+        <a href="#chat">CHAT</a>
+      </div>
+      <div class="footer-copy">
+        © 2025 <span>XI TKJ 1 SMK IMELDA MEDAN</span> — Dibuat dengan ❤️ oleh Tim Kelas
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== BACK TO TOP ===================== -->
+  <a href="#home" id="btt"><i class="bi bi-chevron-up"></i></a>
+
+  <!-- ===================== EXTERNAL JS ===================== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+  <script>
+    /* ============================================================
+       DATA - Siswa, Jadwal, Galeri, Quotes
+    ============================================================ */
+    const siswaData = [
+      {no:1,nama:"Rizky Pratama",nis:"2401001",jk:"L",jabatan:"Ketua"},
+      {no:2,nama:"Dewi Rahmawati",nis:"2401002",jk:"P",jabatan:"Wakil Ketua"},
+      {no:3,nama:"Siti Nurhaliza",nis:"2401003",jk:"P",jabatan:"Sekretaris"},
+      {no:4,nama:"Faisal Hidayat",nis:"2401004",jk:"L",jabatan:"Bendahara"},
+      {no:5,nama:"Rina Marlina",nis:"2401005",jk:"P",jabatan:"Anggota"},
+      {no:6,nama:"Aldi Firmansyah",nis:"2401006",jk:"L",jabatan:"Anggota"},
+      {no:7,nama:"Budi Santoso",nis:"2401007",jk:"L",jabatan:"Anggota"},
+      {no:8,nama:"Wahyu Setiawan",nis:"2401008",jk:"L",jabatan:"Anggota"},
+      {no:9,nama:"Novi Andriani",nis:"2401009",jk:"P",jabatan:"Anggota"},
+      {no:10,nama:"Eko Saputra",nis:"2401010",jk:"L",jabatan:"Anggota"},
+      {no:11,nama:"Hendra Gunawan",nis:"2401011",jk:"L",jabatan:"Anggota"},
+      {no:12,nama:"Putri Wulandari",nis:"2401012",jk:"P",jabatan:"Anggota"},
+      {no:13,nama:"Ahmad Dzikri",nis:"2401013",jk:"L",jabatan:"Anggota"},
+      {no:14,nama:"Nurul Fadhilah",nis:"2401014",jk:"P",jabatan:"Anggota"},
+      {no:15,nama:"Reza Maulana",nis:"2401015",jk:"L",jabatan:"Anggota"},
+      {no:16,nama:"Lestari Indah",nis:"2401016",jk:"P",jabatan:"Anggota"},
+      {no:17,nama:"Yusuf Ramadhan",nis:"2401017",jk:"L",jabatan:"Anggota"},
+      {no:18,nama:"Alya Syafira",nis:"2401018",jk:"P",jabatan:"Anggota"},
+      {no:19,nama:"Fandi Pratama",nis:"2401019",jk:"L",jabatan:"Anggota"},
+      {no:20,nama:"Melisa Anggraini",nis:"2401020",jk:"P",jabatan:"Anggota"},
+      {no:21,nama:"Dimas Aditya",nis:"2401021",jk:"L",jabatan:"Anggota"},
+      {no:22,nama:"Rahma Yulia",nis:"2401022",jk:"P",jabatan:"Anggota"},
+      {no:23,nama:"Surya Darmawan",nis:"2401023",jk:"L",jabatan:"Anggota"},
+      {no:24,nama:"Fitri Handayani",nis:"2401024",jk:"P",jabatan:"Anggota"},
+      {no:25,nama:"Bagas Nugroho",nis:"2401025",jk:"L",jabatan:"Anggota"},
+      {no:26,nama:"Zahra Azizah",nis:"2401026",jk:"P",jabatan:"Anggota"},
+      {no:27,nama:"Teguh Wibowo",nis:"2401027",jk:"L",jabatan:"Anggota"},
+      {no:28,nama:"Citra Permata",nis:"2401028",jk:"P",jabatan:"Anggota"},
+      {no:29,nama:"Ilham Ramadhan",nis:"2401029",jk:"L",jabatan:"Anggota"},
+      {no:30,nama:"Anis Setyaningrum",nis:"2401030",jk:"P",jabatan:"Anggota"},
+      {no:31,nama:"Kevin Fahreza",nis:"2401031",jk:"L",jabatan:"Anggota"},
+      {no:32,nama:"Dinda Khalisa",nis:"2401032",jk:"P",jabatan:"Anggota"},
+      {no:33,nama:"Ridho Pangestu",nis:"2401033",jk:"L",jabatan:"Anggota"},
+      {no:34,nama:"Nadia Safira",nis:"2401034",jk:"P",jabatan:"Anggota"},
+      {no:35,nama:"Galih Prakoso",nis:"2401035",jk:"L",jabatan:"Anggota"},
+      {no:36,nama:"Putri Amelia",nis:"2401036",jk:"P",jabatan:"Anggota"},
+    ];
+
+    const jadwalData = {
+      senin:[
+        {time:"07.00 – 07.45",subject:"Upacara / Pembinaan",guru:"Seluruh Wali Kelas",jp:"1"},
+        {time:"07.45 – 09.15",subject:"Administrasi Infrastruktur Jaringan",guru:"Pak Ridwan, S.Kom",jp:"2"},
+        {time:"09.15 – 10.45",subject:"Teknologi Layanan Jaringan",guru:"Bu Halimah, S.Kom",jp:"3"},
+        {time:"10.45 – 11.00",subject:"Istirahat",guru:"—",jp:"—"},
+        {time:"11.00 – 12.30",subject:"Sistem Operasi Jaringan",guru:"Pak Fadli, S.T",jp:"4"},
+        {time:"12.30 – 13.15",subject:"Istirahat & Sholat",guru:"—",jp:"—"},
+        {time:"13.15 – 14.45",subject:"Matematika",guru:"Bu Erna, S.Pd",jp:"5"},
+      ],
+      selasa:[
+        {time:"07.00 – 08.30",subject:"Bahasa Indonesia",guru:"Bu Sari, S.Pd",jp:"1"},
+        {time:"08.30 – 10.00",subject:"Pemrograman Web",guru:"Pak Hendra, S.Kom",jp:"2"},
+        {time:"10.00 – 10.15",subject:"Istirahat",guru:"—",jp:"—"},
+        {time:"10.15 – 11.45",subject:"Rancang Bangun Jaringan",guru:"Pak Ahmad Fauzi, S.Kom",jp:"3"},
+        {time:"11.45 – 12.30",subject:"Istirahat & Sholat",guru:"—",jp:"—"},
+        {time:"12.30 – 14.00",subject:"Keamanan Jaringan",guru:"Pak Ridwan, S.Kom",jp:"4"},
+        {time:"14.00 – 14.45",subject:"Bahasa Inggris",guru:"Bu Indah, S.Pd",jp:"5"},
+      ],
+      rabu:[
+        {time:"07.00 – 08.30",subject:"Keamanan Jaringan",guru:"Pak Ridwan, S.Kom",jp:"1"},
+        {time:"08.30 – 10.00",subject:"Administrasi Infrastruktur Jaringan",guru:"Pak Ridwan, S.Kom",jp:"2"},
+        {time:"10.00 – 10.15",subject:"Istirahat",guru:"—",jp:"—"},
+        {time:"10.15 – 11.45",subject:"Fisika",guru:"Bu Maya, S.Pd",jp:"3"},
+        {time:"11.45 – 12.30",subject:"Istirahat & Sholat",guru:"—",jp:"—"},
+        {time:"12.30 – 14.00",subject:"Praktik TKJ Lab",guru:"Pak Ahmad Fauzi, S.Kom",jp:"4"},
+        {time:"14.00 – 14.45",subject:"Kewirausahaan",guru:"Bu Novia, S.E",jp:"5"},
+      ],
+      kamis:[
+        {time:"07.00 – 08.30",subject:"Teknologi Layanan Jaringan",guru:"Bu Halimah, S.Kom",jp:"1"},
+        {time:"08.30 – 10.00",subject:"Sistem Operasi Jaringan",guru:"Pak Fadli, S.T",jp:"2"},
+        {time:"10.00 – 10.15",subject:"Istirahat",guru:"—",jp:"—"},
+        {time:"10.15 – 11.45",subject:"Pendidikan Agama",guru:"Bu Rasyidah, S.Ag",jp:"3"},
+        {time:"11.45 – 12.30",subject:"Istirahat & Sholat",guru:"—",jp:"—"},
+        {time:"12.30 – 14.00",subject:"Sejarah Indonesia",guru:"Bu Lina, S.Pd",jp:"4"},
+        {time:"14.00 – 14.45",subject:"Seni Budaya",guru:"Pak Yudi, S.Pd",jp:"5"},
+      ],
+      jumat:[
+        {time:"07.00 – 07.30",subject:"Senam / Olahraga Pagi",guru:"Pak Rudi, S.Pd",jp:"1"},
+        {time:"07.30 – 09.00",subject:"Penjasorkes",guru:"Pak Rudi, S.Pd",jp:"2"},
+        {time:"09.00 – 10.30",subject:"Pemrograman Web",guru:"Pak Hendra, S.Kom",jp:"3"},
+        {time:"10.30 – 11.00",subject:"Istirahat & Sholat Jumat",guru:"—",jp:"—"},
+        {time:"11.00 – 12.30",subject:"PKn / PPKn",guru:"Bu Wati, S.Pd",jp:"4"},
+      ],
+    };
+
+    const galeriData = [
+      {emoji:"🖥️",label:"PRAKTIK JARINGAN",color:"linear-gradient(135deg,rgba(0,240,255,0.12),rgba(0,0,80,0.8))"},
+      {emoji:"🏆",label:"JUARA LOMBA LKS",color:"linear-gradient(135deg,rgba(191,0,255,0.12),rgba(40,0,60,0.8))"},
+      {emoji:"🎓",label:"WISUDA KELAS",color:"linear-gradient(135deg,rgba(0,240,255,0.1),rgba(0,20,60,0.8))"},
+      {emoji:"⚽",label:"TURNAMEN OLAHRAGA",color:"linear-gradient(135deg,rgba(0,255,150,0.1),rgba(0,40,20,0.8))"},
+      {emoji:"💻",label:"WORKSHOP CISCO",color:"linear-gradient(135deg,rgba(0,240,255,0.12),rgba(0,0,80,0.8))"},
+      {emoji:"🎉",label:"PENSI SEKOLAH",color:"linear-gradient(135deg,rgba(255,0,150,0.1),rgba(60,0,30,0.8))"},
+      {emoji:"🔧",label:"PRAKERIN",color:"linear-gradient(135deg,rgba(191,0,255,0.1),rgba(20,0,40,0.8))"},
+      {emoji:"📚",label:"BELAJAR KELOMPOK",color:"linear-gradient(135deg,rgba(0,240,255,0.08),rgba(0,10,30,0.8))"},
+    ];
+
+    const quotesData = [
+      {text:"Teknologi adalah alat yang paling kuat yang bisa digunakan manusia untuk mengubah dunia.",author:"— Bill Gates"},
+      {text:"The best way to predict the future is to invent it. Cara terbaik memprediksi masa depan adalah menciptakannya.",author:"— Alan Kay"},
+      {text:"Code is like humor. When you have to explain it, it's bad. Jadilah programmer yang kodenya berbicara sendiri.",author:"— Cory House"},
+      {text:"Pendidikan adalah senjata paling mematikan di dunia, karena dengan itu, kamu dapat mengubah dunia.",author:"— Nelson Mandela"},
+      {text:"Sukses bukan tentang seberapa cepat kamu sampai, tapi tentang apakah kamu tetap bangkit setiap kali jatuh.",author:"— XI TKJ 1 Spirit"},
+      {text:"Jangan takut gagal. Kegagalan adalah bukti bahwa kamu sedang mencoba sesuatu yang baru dan berani.",author:"— Unknown"},
+    ];
+
+    const defaultChats = [
+      {name:"Rizky",msg:"Selamat datang di chat XI TKJ 1! 🚀",sent:false},
+      {name:"Dewi",msg:"Semangat belajar semuanya! 💪",sent:false},
+      {name:"Faisal",msg:"Praktek jaringan besok jam 8 ya guys!",sent:false},
+    ];
+
+    /* ============================================================
+       LOADING SCREEN
+    ============================================================ */
+    let pct = 0;
+    const pctEl = document.getElementById('loader-pct');
+    const ldrInterval = setInterval(() => {
+      pct += Math.random() * 8 + 2;
+      if (pct >= 100) { pct = 100; clearInterval(ldrInterval); }
+      pctEl.textContent = Math.round(pct) + '%';
+    }, 80);
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hide');
+        initAnimations();
+      }, 2400);
+    });
+
+    /* ============================================================
+       CUSTOM CURSOR
+    ============================================================ */
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+    function animateCursor(){
+      dot.style.transform = `translate(${mx-4}px,${my-4}px)`;
+      rx += (mx-rx-18)*0.12; ry += (my-ry-18)*0.12;
+      ring.style.transform = `translate(${rx}px,${ry}px)`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    /* ============================================================
+       MATRIX RAIN
+    ============================================================ */
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+    function resizeMatrix(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+    resizeMatrix(); window.addEventListener('resize', resizeMatrix);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()アイウエオカキクケコ';
+    let cols, drops=[];
+    function initMatrix(){
+      cols = Math.floor(canvas.width/18);
+      drops = Array.from({length:cols},()=>Math.random()*-canvas.height/18);
+    }
+    initMatrix();
+    function drawMatrix(){
+      ctx.fillStyle='rgba(2,8,24,0.05)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#00f0ff'; ctx.font='14px Share Tech Mono';
+      drops.forEach((d,i)=>{
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*18,d*18);
+        if(d*18>canvas.height && Math.random()>0.975) drops[i]=0;
+        drops[i]+=0.5;
+      });
+    }
+    setInterval(drawMatrix, 50);
+
+    /* ============================================================
+       NAVBAR SCROLL
+    ============================================================ */
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('navbar');
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+      const btt = document.getElementById('btt');
+      btt.classList.toggle('visible', window.scrollY > 400);
+    });
+
+    /* ============================================================
+       REAL-TIME CLOCK
+    ============================================================ */
+    function updateClock(){
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2,'0');
+      const mm = String(now.getMinutes()).padStart(2,'0');
+      const ss = String(now.getSeconds()).padStart(2,'0');
+      const timeStr = `${hh}:${mm}:${ss}`;
+      const navClock = document.getElementById('nav-clock');
+      const digClock = document.getElementById('digital-clock');
+      const digDate = document.getElementById('digital-date');
+      if(navClock) navClock.textContent = timeStr;
+      if(digClock) digClock.textContent = timeStr;
+      if(digDate){
+        const days=['MINGGU','SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU'];
+        const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        digDate.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      }
+    }
+    updateClock(); setInterval(updateClock, 1000);
+
+    /* ============================================================
+       TYPED ANIMATION
+    ============================================================ */
+    const typedPhrases = [
+      "Generasi Teknisi Masa Depan",
+      "Expert Network Engineers",
+      "Cyber Security Warriors",
+      "Innovators of Tomorrow",
+      "Team XI TKJ 1 — Juara! 🏆"
+    ];
+    let tpi=0, tci=0, tdeleting=false;
+    const tEl = document.getElementById('typed-text');
+    function typeLoop(){
+      const phrase = typedPhrases[tpi];
+      if(!tdeleting){
+        tEl.textContent = phrase.slice(0, ++tci);
+        if(tci===phrase.length){ tdeleting=true; setTimeout(typeLoop,1800); return; }
+        setTimeout(typeLoop, 65);
+      } else {
+        tEl.textContent = phrase.slice(0, --tci);
+        if(tci===0){ tdeleting=false; tpi=(tpi+1)%typedPhrases.length; setTimeout(typeLoop,400); return; }
+        setTimeout(typeLoop, 35);
+      }
+    }
+    setTimeout(typeLoop, 2800);
+
+    /* ============================================================
+       COUNTER ANIMATION
+    ============================================================ */
+    function animateCounters(){
+      document.querySelectorAll('[data-target]').forEach(el => {
+        const target = +el.getAttribute('data-target');
+        let cur = 0;
+        const step = target > 1000 ? 40 : (target > 100 ? 3 : 1);
+        const inc = Math.ceil(target / 60);
+        const t = setInterval(() => {
+          cur = Math.min(cur + inc, target);
+          el.textContent = cur;
+          if(cur >= target) clearInterval(t);
+        }, 30);
+      });
+    }
+
+    /* ============================================================
+       INIT AFTER LOAD
+    ============================================================ */
+    function initAnimations(){
+      AOS.init({ duration: 800, easing: 'ease-out-cubic', once: true, offset: 60 });
+      VanillaTilt.init(document.querySelectorAll('.glass-card'), {
+        max: 5, speed: 400, glare: true, 'max-glare': 0.1
+      });
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.from('.hero-content > *', { y: 40, opacity: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out', delay: 0.3 });
+      ScrollTrigger.create({
+        trigger: '#tentang',
+        onEnter: animateCounters
+      });
+      renderSiswa(siswaData);
+      renderJadwal('senin');
+      renderGaleri();
+      renderQuotes();
+      renderCalendar(new Date());
+      initDefaultChats();
+      initPesan();
+      addRippleEffect();
+    }
+
+    /* ============================================================
+       SISWA TABLE
+    ============================================================ */
+    function renderSiswa(data){
+      const tbody = document.getElementById('siswa-tbody');
+      tbody.innerHTML = data.map(s => `
+        <tr>
+          <td>${String(s.no).padStart(2,'0')}</td>
+          <td style="color:#e0f7ff;font-weight:600">${s.nama}</td>
+          <td>${s.nis}</td>
+          <td>${s.jk === 'L' ? '♂ Putra' : '♀ Putri'}</td>
+          <td><span class="badge-status ${s.jabatan === 'Ketua' ? 'badge-ketua' : 'badge-active'}">${s.jabatan}</span></td>
+          <td><span class="badge-status badge-active">AKTIF</span></td>
+        </tr>
+      `).join('');
+    }
+    function filterSiswa(q){
+      const filtered = siswaData.filter(s => s.nama.toLowerCase().includes(q.toLowerCase()));
+      renderSiswa(filtered);
+    }
+
+    /* ============================================================
+       JADWAL
+    ============================================================ */
+    const dayNames = ['senin','selasa','rabu','kamis','jumat'];
+    function renderJadwal(day){
+      const panel = document.getElementById('jadwal-panels');
+      const items = jadwalData[day];
+      panel.innerHTML = `<div class="jadwal-content active">${items.map(j => `
+        <div class="jadwal-item">
+          <div class="jadwal-time"><i class="bi bi-clock" style="margin-right:0.4rem;opacity:0.5"></i>${j.time}</div>
+          <div>
+            <div class="jadwal-subject">${j.subject}</div>
+            <div class="jadwal-guru">${j.guru}</div>
+          </div>
+          <div class="jadwal-num">JP ${j.jp}</div>
+        </div>
+      `).join('')}</div>`;
+    }
+    function switchTab(btn, day){
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderJadwal(day);
+    }
+
+    /* ============================================================
+       GALERI
+    ============================================================ */
+    function renderGaleri(){
+      const grid = document.getElementById('galeri-grid');
+      grid.innerHTML = galeriData.map((g,i) => `
+        <div class="galeri-item" data-aos="zoom-in" data-aos-delay="${i*80}">
+          <div class="galeri-bg" style="background:${g.color}">
+            <div style="font-size:3rem">${g.emoji}</div>
+          </div>
+          <div class="galeri-overlay">
+            <div class="galeri-label"><i class="bi bi-camera-fill" style="margin-right:0.4rem"></i>${g.label}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* ============================================================
+       QUOTES SLIDER
+    ============================================================ */
+    let currentQ = 0;
+    function renderQuotes(){
+      const dots = document.getElementById('quote-dots');
+      dots.innerHTML = quotesData.map((_,i) => `<div class="quote-dot ${i===0?'active':''}" onclick="setQuote(${i})"></div>`).join('');
+      setQuote(0);
+    }
+    function setQuote(i){
+      currentQ = i;
+      const q = quotesData[i];
+      const tEl = document.getElementById('q-text');
+      const aEl = document.getElementById('q-author');
+      tEl.style.opacity = 0;
+      setTimeout(() => { tEl.textContent = q.text; aEl.textContent = q.author; tEl.style.opacity = 1; }, 200);
+      document.querySelectorAll('.quote-dot').forEach((d,j) => d.classList.toggle('active', j===i));
+    }
+    setInterval(() => setQuote((currentQ+1)%quotesData.length), 5000);
+
+    /* ============================================================
+       KALENDER
+    ============================================================ */
+    let calDate = new Date();
+    function renderCalendar(d){
+      const months = ['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
+      document.getElementById('cal-month-label').textContent = `${months[d.getMonth()]} ${d.getFullYear()}`;
+      const grid = document.getElementById('cal-grid');
+      const dayNames = ['MIN','SEN','SEL','RAB','KAM','JUM','SAB'];
+      const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+      const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+      const today = new Date();
+      let html = dayNames.map(dn => `<div class="cal-day-name">${dn}</div>`).join('');
+      for(let i=0;i<firstDay;i++) html += `<div class="cal-date empty">-</div>`;
+      for(let i=1;i<=daysInMonth;i++){
+        const isToday = i===today.getDate() && d.getMonth()===today.getMonth() && d.getFullYear()===today.getFullYear();
+        html += `<div class="cal-date ${isToday?'today':''}">${i}</div>`;
+      }
+      grid.innerHTML = html;
+    }
+    function calPrev(){ calDate.setMonth(calDate.getMonth()-1); renderCalendar(calDate); }
+    function calNext(){ calDate.setMonth(calDate.getMonth()+1); renderCalendar(calDate); }
+
+    /* ============================================================
+       FIREBASE CONFIG & INIT
+    ============================================================ */
+    // Import Firebase via CDN (compat version untuk kemudahan)
+    const fbScript1 = document.createElement('script');
+    fbScript1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+    document.head.appendChild(fbScript1);
+
+    fbScript1.onload = () => {
+      const fbScript2 = document.createElement('script');
+      fbScript2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';
+      document.head.appendChild(fbScript2);
+      fbScript2.onload = () => {
+        // Konfigurasi Firebase project TKJ1-Chat
+        const firebaseConfig = {
+          apiKey: "AIzaSyAub3il781ngC88d177BWbiLcIAn_85fpc",
+          authDomain: "tkj1-chat.firebaseapp.com",
+          databaseURL: "https://tkj1-chat-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "tkj1-chat",
+          storageBucket: "tkj1-chat.firebasestorage.app",
+          messagingSenderId: "233481239276",
+          appId: "1:233481239276:web:5b4852503b45dd27edc3c9"
+        };
+        // Inisialisasi Firebase
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        initFirebasePesan(db);
+        initFirebaseChat(db);
+      };
+    };
+
+    function getTime(){
+      const n=new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+    }
+
+    /* ============================================================
+       PESAN ANONIM — FIREBASE REALTIME
+    ============================================================ */
+    function initFirebasePesan(db){
+      // Dengarkan perubahan data pesan secara realtime
+      const pesanRef = db.ref('pesan_anonim').limitToLast(20);
+      pesanRef.on('value', snapshot => {
+        const list = document.getElementById('pesan-list');
+        const data = snapshot.val();
+        if(!data){ list.innerHTML = '<div style="font-family:var(--font-mono);font-size:0.75rem;color:rgba(224,247,255,0.3);text-align:center;padding:2rem">Belum ada pesan. Jadilah yang pertama! 👋</div>'; return; }
+        // Ambil semua pesan dan urutkan terbaru di atas
+        const pesanArr = Object.values(data).reverse();
+        list.innerHTML = pesanArr.map(p => `
+          <div class="pesan-item">
+            <div class="pesan-header">
+              <span class="pesan-from"><i class="bi bi-person-circle" style="margin-right:0.4rem"></i>${escHtml(p.nama)}</span>
+              <span class="pesan-time">${escHtml(p.time)}</span>
+            </div>
+            <div class="pesan-body">${escHtml(p.text)}</div>
+          </div>
+        `).join('');
+      });
+    }
+
+    function kirimPesan(){
+      if(typeof firebase === 'undefined' || !firebase.apps.length){
+        alert('Firebase belum siap, tunggu sebentar lalu coba lagi.'); return;
+      }
+      const db = firebase.database();
+      const nama = document.getElementById('pesan-nama').value.trim() || 'Anonymous';
+      const text = document.getElementById('pesan-text').value.trim();
+      if(!text) return;
+      // Kirim ke Firebase — otomatis sync ke semua device
+      db.ref('pesan_anonim').push({ nama, text, time: getTime(), ts: Date.now() })
+        .then(() => {
+          document.getElementById('pesan-nama').value = '';
+          document.getElementById('pesan-text').value = '';
+        })
+        .catch(err => alert('Gagal kirim: ' + err.message));
+    }
+
+    // Dummy initPesan agar tidak error saat dipanggil sebelum Firebase siap
+    function initPesan(){ /* ditangani Firebase */ }
+
+    /* ============================================================
+       CHAT REALTIME — FIREBASE REALTIME
+    ============================================================ */
+    let myName = '';
+
+    function initFirebaseChat(db){
+      // Dengarkan pesan chat secara realtime, ambil 50 pesan terakhir
+      const chatRef = db.ref('chat_kelas').limitToLast(50);
+      chatRef.on('child_added', snapshot => {
+        const c = snapshot.val();
+        appendChatMsg(c);
+      });
+    }
+
+    function appendChatMsg(c){
+      const box = document.getElementById('chat-messages');
+      const isSent = c.name === myName && myName !== '';
+      const div = document.createElement('div');
+      div.className = `chat-msg ${isSent ? 'sent' : ''}`;
+      div.innerHTML = `
+        <div class="chat-avatar ${isSent ? 'sent-av' : 'recv'}">${c.name[0].toUpperCase()}</div>
+        <div class="chat-bubble ${isSent ? 'sent-b' : 'recv'}">
+          <div class="chat-sender">${escHtml(c.name)} · ${escHtml(c.time)}</div>
+          ${escHtml(c.msg)}
+        </div>
+      `;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendChat(){
+      if(typeof firebase === 'undefined' || !firebase.apps.length){
+        alert('Firebase belum siap, tunggu sebentar lalu coba lagi.'); return;
+      }
+      const db = firebase.database();
+      const inp = document.getElementById('chat-input');
+      const nameInp = document.getElementById('chat-name');
+      const msg = inp.value.trim();
+      const name = nameInp.value.trim() || 'Anonymous';
+      if(!msg) return;
+      myName = name; // simpan nama untuk membedakan pesan sent/recv
+      // Kirim ke Firebase — langsung muncul di semua device
+      db.ref('chat_kelas').push({ name, msg, time: getTime(), ts: Date.now() })
+        .then(() => { inp.value = ''; })
+        .catch(err => alert('Gagal kirim: ' + err.message));
+    }
+
+    // Dummy initDefaultChats agar tidak error
+    function initDefaultChats(){ /* ditangani Firebase */ }
+
+    /* Escape HTML untuk keamanan (cegah XSS) */
+    function escHtml(str){
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ============================================================
+       MOBILE NAV
+    ============================================================ */
+    function toggleMobileNav(){
+      const nav = document.getElementById('mobile-nav');
+      const ov = document.getElementById('nav-overlay');
+      const isOpen = nav.classList.contains('open');
+      if(isOpen){ nav.classList.remove('open'); ov.style.display='none'; }
+      else { nav.classList.add('open'); ov.style.display='block'; }
+    }
+    function closeMobileNav(){
+      document.getElementById('mobile-nav').classList.remove('open');
+      document.getElementById('nav-overlay').style.display='none';
+    }
+
+    /* ============================================================
+       RIPPLE EFFECT ON BUTTONS
+    ============================================================ */
+    function addRippleEffect(){
+      document.querySelectorAll('.btn-cyber').forEach(btn => {
+        btn.addEventListener('click', function(e){
+          const r = document.createElement('span');
+          r.className = 'ripple';
+          const rect = this.getBoundingClientRect();
+          r.style.left = (e.clientX - rect.left) + 'px';
+          r.style.top  = (e.clientY - rect.top) + 'px';
+          this.appendChild(r);
+          setTimeout(() => r.remove(), 700);
+        });
+      });
+    }
+
+    /* ============================================================
+       GSAP FLOATING ELEMENTS
+    ============================================================ */
+    window.addEventListener('load', () => {
+      if(typeof gsap !== 'undefined'){
+        gsap.to('.hero-badge', { y:-8, duration:2, repeat:-1, yoyo:true, ease:'sine.inOut' });
+      }
+    });
+  </script>
+</body>
+</html>
