@@ -1191,91 +1191,10 @@
       </div>
 
       <div class="video-grid" id="video-grid">
-
-        <div class="video-card" data-aos="zoom-in" data-aos-delay="0" onclick="playVideo('LKS Networking 2023')">
-          <div class="video-thumb" style="background:linear-gradient(135deg,#001030,#003060)">
-            <div class="thumb-overlay"></div>
-            <span class="thumb-emoji">🌐</span>
-            <div class="play-btn"><i class="bi bi-play-fill"></i></div>
-            <div class="video-duration">3:42</div>
-          </div>
-          <div class="video-body">
-            <div class="video-cat">// KOMPETISI</div>
-            <div class="video-title">Highlight LKS IT Network Systems 2023</div>
-            <div class="video-meta">Oktober 2023 • Tim XI TKJ 1</div>
-          </div>
+        <div id="video-empty" style="grid-column:1/-1;text-align:center;padding:3rem;font-family:var(--font-mono);font-size:.72rem;color:rgba(224,247,255,.25);letter-spacing:.1em">
+          <i class="bi bi-camera-video" style="font-size:2.5rem;display:block;margin-bottom:.75rem;opacity:.3"></i>
+          Belum ada video. Tambahkan link YouTube di bawah.
         </div>
-
-        <div class="video-card" data-aos="zoom-in" data-aos-delay="80" onclick="playVideo('Workshop Cisco')">
-          <div class="video-thumb" style="background:linear-gradient(135deg,#200040,#500090)">
-            <div class="thumb-overlay"></div>
-            <span class="thumb-emoji">🔧</span>
-            <div class="play-btn"><i class="bi bi-play-fill"></i></div>
-            <div class="video-duration">12:05</div>
-          </div>
-          <div class="video-body">
-            <div class="video-cat">// WORKSHOP</div>
-            <div class="video-title">Workshop Cisco Networking Academy 2024</div>
-            <div class="video-meta">Februari 2024 • Dokumentasi Kelas</div>
-          </div>
-        </div>
-
-        <div class="video-card" data-aos="zoom-in" data-aos-delay="160" onclick="playVideo('Prakerin')">
-          <div class="video-thumb" style="background:linear-gradient(135deg,#002010,#004020)">
-            <div class="thumb-overlay"></div>
-            <span class="thumb-emoji">🏭</span>
-            <div class="play-btn"><i class="bi bi-play-fill"></i></div>
-            <div class="video-duration">8:30</div>
-          </div>
-          <div class="video-body">
-            <div class="video-cat">// PRAKERIN</div>
-            <div class="video-title">Vlog Prakerin Siswa XI TKJ 1 di Medan</div>
-            <div class="video-meta">Juni 2024 • Dokumentasi Prakerin</div>
-          </div>
-        </div>
-
-        <div class="video-card" data-aos="zoom-in" data-aos-delay="240" onclick="playVideo('Perpisahan')">
-          <div class="video-thumb" style="background:linear-gradient(135deg,#300010,#600030)">
-            <div class="thumb-overlay"></div>
-            <span class="thumb-emoji">🎉</span>
-            <div class="play-btn"><i class="bi bi-play-fill"></i></div>
-            <div class="video-duration">5:18</div>
-          </div>
-          <div class="video-body">
-            <div class="video-cat">// ACARA</div>
-            <div class="video-title">Class Meeting & Pensi Akhir Semester 2023</div>
-            <div class="video-meta">Desember 2023 • Dokumentasi Kelas</div>
-          </div>
-        </div>
-
-        <div class="video-card" data-aos="zoom-in" data-aos-delay="320" onclick="playVideo('Tutorial MikroTik')">
-          <div class="video-thumb" style="background:linear-gradient(135deg,#001020,#002040)">
-            <div class="thumb-overlay"></div>
-            <span class="thumb-emoji">📡</span>
-            <div class="play-btn"><i class="bi bi-play-fill"></i></div>
-            <div class="video-duration">18:45</div>
-          </div>
-          <div class="video-body">
-            <div class="video-cat">// TUTORIAL</div>
-            <div class="video-title">Tutorial Konfigurasi MikroTik RouterOS</div>
-            <div class="video-meta">Agustus 2024 • Bpk. Ahmad Fauzi</div>
-          </div>
-        </div>
-
-        <div class="video-card" data-aos="zoom-in" data-aos-delay="400" onclick="playVideo('Perkenalan Kelas')">
-          <div class="video-thumb" style="background:linear-gradient(135deg,#100020,#300060)">
-            <div class="thumb-overlay"></div>
-            <span class="thumb-emoji">👋</span>
-            <div class="play-btn"><i class="bi bi-play-fill"></i></div>
-            <div class="video-duration">2:55</div>
-          </div>
-          <div class="video-body">
-            <div class="video-cat">// PROFIL</div>
-            <div class="video-title">Profil & Perkenalan Kelas XI TKJ 1</div>
-            <div class="video-meta">September 2024 • Tim Media Kelas</div>
-          </div>
-        </div>
-
       </div>
 
       <!-- Area Upload Foto -->
@@ -1341,10 +1260,23 @@
       <button class="yt-modal-close" onclick="closeYtModal()"><i class="bi bi-x-lg"></i> TUTUP</button>
       <div class="yt-iframe-wrap">
         <iframe id="yt-iframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+        <!-- Fallback overlay jika embed gagal -->
+        <div id="yt-fallback" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,.92);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;padding:2rem;text-align:center">
+          <div style="font-size:3rem">⚠️</div>
+          <div style="font-family:var(--font-display);font-size:.85rem;color:rgba(255,180,80,.9);letter-spacing:.1em">VIDEO TIDAK BISA DI-EMBED</div>
+          <div style="font-family:var(--font-mono);font-size:.68rem;color:rgba(224,247,255,.45);max-width:340px;line-height:1.8">Pemilik video ini menonaktifkan fitur embed.<br>Tonton langsung di YouTube:</div>
+          <a id="yt-modal-ytlink" href="#" target="_blank" rel="noopener" style="font-family:var(--font-mono);font-size:.75rem;padding:.75rem 1.8rem;border-radius:8px;background:rgba(255,0,0,.85);color:#fff;font-weight:700;letter-spacing:.1em;display:inline-flex;align-items:center;gap:.5rem;transition:all .3s" onmouseover="this.style.background='rgba(200,0,0,.95)'" onmouseout="this.style.background='rgba(255,0,0,.85)'">
+            <i class="bi bi-youtube"></i> BUKA DI YOUTUBE
+          </a>
+          <div style="font-family:var(--font-mono);font-size:.6rem;color:rgba(224,247,255,.25)">Tip: Gunakan video YouTube milikmu sendiri agar bisa di-embed</div>
+        </div>
       </div>
       <div class="yt-modal-title" id="yt-modal-title"></div>
-    </div>
-  </div>
+      <div style="text-align:center;margin-top:.6rem">
+        <a id="yt-open-link" href="#" target="_blank" rel="noopener" style="font-family:var(--font-mono);font-size:.62rem;color:rgba(255,100,100,.6);letter-spacing:.08em;text-decoration:none;transition:color .2s" onmouseover="this.style.color='rgba(255,80,80,.9)'" onmouseout="this.style.color='rgba(255,100,100,.6)'">
+          <i class="bi bi-box-arrow-up-right"></i> Tidak bisa diputar? Buka di YouTube
+        </a>
+      </div>
 
   <!-- ===== FOOTER ===== -->
   <footer>
@@ -1623,6 +1555,10 @@
       // cek duplikat
       if(document.getElementById('ytcard-'+key)) return;
 
+      // Sembunyikan placeholder kosong
+      const empty = document.getElementById('video-empty');
+      if(empty) empty.style.display = 'none';
+
       const thumbUrl = thumb || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
       const card = document.createElement('div');
       card.className = 'video-card-yt';
@@ -1644,15 +1580,43 @@
     }
 
     function openYtModal(videoId, title){
+      const ytUrl = `https://www.youtube.com/watch?v=${videoId}`;
       document.getElementById('yt-iframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
       document.getElementById('yt-modal-title').textContent = title;
+      document.getElementById('yt-modal-ytlink').href = ytUrl;
+      document.getElementById('yt-open-link').href = ytUrl;
       document.getElementById('yt-modal').classList.add('open');
+      // Reset tampilan
+      document.getElementById('yt-iframe').style.display = '';
+      document.getElementById('yt-fallback').style.display = 'none';
     }
 
     function closeYtModal(){
       document.getElementById('yt-modal').classList.remove('open');
-      document.getElementById('yt-iframe').src = '';
+      const iframe = document.getElementById('yt-iframe');
+      iframe.src = '';
+      iframe.style.display = '';
+      document.getElementById('yt-fallback').style.display = 'none';
     }
+
+    // Deteksi error embed YouTube (Error 153 dll)
+    document.addEventListener('DOMContentLoaded', () => {
+      const iframe = document.getElementById('yt-iframe');
+      iframe.addEventListener('load', function(){
+        // Coba deteksi via postMessage dari YouTube
+      });
+    });
+
+    window.addEventListener('message', function(e){
+      if(!e.origin.includes('youtube.com')) return;
+      try {
+        const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+        // YouTube kirim error via postMessage jika embed diblokir
+        if(data && (data.event === 'onError' || (data.info && data.info >= 100))){
+          showYtFallback();
+        }
+      } catch(_){}
+    });
 
     document.getElementById('yt-modal').addEventListener('click', function(e){
       if(e.target === this) closeYtModal();
@@ -1663,7 +1627,18 @@
       db.ref(`dokumentasi/${key}`).remove().then(() => {
         const el = document.getElementById('ytcard-'+key);
         if(el) el.remove();
+        // Tampilkan placeholder jika grid kosong
+        const grid = document.getElementById('video-grid');
+        if(!grid.querySelector('.video-card-yt')){
+          const empty = document.getElementById('video-empty');
+          if(empty) empty.style.display = '';
+        }
       });
+    }
+
+    function showYtFallback(){
+      document.getElementById('yt-iframe').style.display = 'none';
+      document.getElementById('yt-fallback').style.display = 'flex';
     }
 
     /* ===== Enter key untuk input YouTube ===== */
